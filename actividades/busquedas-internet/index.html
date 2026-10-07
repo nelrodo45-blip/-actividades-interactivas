@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, ">
+    <title>Búsquedas en Internet, IA y Criterios Críticos • CENS N° 3-468 • Prof. Nelson Garro</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        cens: {
+                            50: '#f0f9ff',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+        // =========================================
+        // MODO PANTALLA COMPLETA
+        // Compatible con Google Sites / iframe
+        // =========================================
+        function isFullscreenActive() {
+            return !!document.fullscreenElement ||
+                   document.body.classList.contains('presentation-fullscreen') ||
+                   document.body.classList.contains('presentation-fullscreen-fallback');
+        }
+
+        function updateFullscreenButton() {
+            const btn = document.getElementById('fullscreenBtn');
+            const icon = document.getElementById('fullscreenIcon');
+
+            if (!btn || !icon) return;
+
+            if (isFullscreenActive()) {
+                icon.className = 'fa-solid fa-compress';
+                btn.title = 'Salir de pantalla completa';
+                btn.setAttribute('aria-label', 'Salir de pantalla completa');
+            } else {
+                icon.className = 'fa-solid fa-expand';
+                btn.title = 'Ver presentación en pantalla completa';
+                btn.setAttribute('aria-label', 'Ver presentación en pantalla completa');
+            }
+        }
+
+        async function toggleFullscreen() {
+            /*
+             * Google Sites muestra este HTML dentro de un IFRAME.
+             * Un iframe no puede ocupar la pantalla del navegador por sí solo
+             * si Google Sites no le concede allowfullscreen.
+             * Por eso primero intentamos Fullscreen API y, si el navegador
+             * la bloquea, abrimos una copia independiente de la actividad.
+             */
+            try {
+                if (document.fullscreenElement) {
+                    await document.exitFullscreen();
+                    document.body.classList.remove('presentation-fullscreen');
+                    updateFullscreenButton();
+                    return;
+                }
+
+                if (document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
+                    document.body.classList.add('presentation-fullscreen');
+                    updateFullscreenButton();
+                    return;
+                }
+            } catch (error) {
+                console.log('Fullscreen del iframe no disponible:', error);
+            }
+
+            /* Fallback real: abrir la actividad como página independiente. */
+            openStandalonePresentation();
+        }
+
+        function openStandalonePresentation() {
+            const win = window.open('', '_blank', 'noopener,noreferrer');
+
+            if (!win) {
+                alert('El navegador bloqueó la ventana emergente. Permite las ventanas emergentes para este sitio y vuelve a pulsar Pantalla completa.');
+                return;
+            }
+
+            const source = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+            win.document.open();
+            win.document.write(source);
+            win.document.close();
+
+            /*
+             * La nueva pestaña ya no está dentro de Google Sites.
+             * Mostramos un aviso breve para que el docente pueda activar
+             * Fullscreen con un segundo clic si el navegador lo exige.
+             */
+            win.addEventListener('load', () => {
+                try {
+                    win.document.body.classList.add('presentation-fullscreen');
+                    win.document.documentElement.style.width = '100%';
+                    win.document.documentElement.style.height = '100%';
+                    win.document.body.style.width = '100vw';
+                    win.document.body.style.height = '100vh';
+                } catch (e) {}
+            });
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                document.body.classList.remove('presentation-fullscreen');
+            }
+            updateFullscreenButton();
+        });
+
+        // Tecla ESC: salir de pantalla completa.
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && document.body.classList.contains('presentation-fullscreen-fallback')) {
+                document.body.classList.remove('presentation-fullscreen-fallback');
+                document.body.classList.remove('presentation-fullscreen');
+                updateFullscreenButton();
+            }
+        });
+
+        // Recalcular el viewport al cambiar orientación/tamaño.
+        window.addEventListener('resize', () => {
+            updateFullscreenButton();
+        });
+
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.8);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.5);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.8);
+        }
+
+        .slide-fade-in {
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.99); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+
+        /* =========================================
+           MODO PANTALLA COMPLETA - GOOGLE SITES
+           ========================================= */
+        html, body {
+            width: 100%;
+            min-width: 100%;
+            min-height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+        }
+
+        main {
+            width: 100%;
+            min-width: 100%;
+            box-sizing: border-box;
+        }
+
+        #appViewport {
+            width: 100% !important;
+            box-sizing: border-box;
+        }
+
+        /* Elemento raíz cuando se activa Fullscreen */
+        body.presentation-fullscreen {
+            width: 100vw !important;
+            height: 100vh !important;
+            min-height: 100vh !important;
+            overflow: hidden !important;
+        }
+
+        body.presentation-fullscreen > header,
+        body.presentation-fullscreen > main,
+        body.presentation-fullscreen > footer {
+            width: 100vw !important;
+        }
+
+        body.presentation-fullscreen > main {
+            height: calc(100vh - 118px) !important;
+            min-height: 0 !important;
+            padding: 12px !important;
+        }
+
+        body.presentation-fullscreen #appViewport {
+            min-height: 0 !important;
+            height: 100% !important;
+        }
+
+        /* Botón de pantalla completa */
+        #fullscreenBtn {
+            position: relative;
+            z-index: 100;
+        }
+
+        #fullscreenBtn .fullscreen-label {
+            display: inline;
+        }
+
+        @media (max-width: 900px) {
+            #fullscreenBtn .fullscreen-label {
+                display: none;
+            }
+        }
+
+        /* Fallback visual si el navegador no permite API Fullscreen */
+        body.presentation-fullscreen-fallback {
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 99999 !important;
+            background: #020617 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            overflow: hidden !important;
+        }
+
+        body.presentation-fullscreen-fallback > header,
+        body.presentation-fullscreen-fallback > main,
+        body.presentation-fullscreen-fallback > footer {
+            width: 100vw !important;
+        }
+
+        body.presentation-fullscreen-fallback > main {
+            height: calc(100vh - 118px) !important;
+            min-height: 0 !important;
+        }
+
+        body.presentation-fullscreen-fallback #appViewport {
+            height: 100% !important;
+            min-height: 0 !important;
+        }
+
+        /* Ocultar barras de scroll horizontales */
+        html, body {
+            overflow-x: hidden;
+        }
+
+        @media print {
+            html, body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                overflow: visible !important;
+                height: auto !important;
+                font-size: 13pt !important;
+            }
+            .no-print, header, footer, nav, button, .modal-backdrop, #tpModal, #slideMenuModal, #teacherNotesDrawer, main {
+                display: none !important;
+            }
+            #printableWorksheet {
+                display: block !important;
+                position: relative !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                padding: 15px !important;
+                margin: 0 !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            .answer-line-print {
+                border-bottom: 1px dashed #64748b !important;
+                margin-top: 12px;
+                height: 28px;
+            }
+        }
+    
+        /* Integración como actividad del Portal de Actividades */
+        html, body { width:100%; max-width:100%; margin:0; }
+        body { min-height:100dvh; }
+        main { min-width:0; }
+        #appViewport { min-height:0; }
+        @media (max-width:640px) { #appViewport { border-radius:1rem; padding:1rem !important; } }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans h-full flex flex-col justify-between overflow-x-hidden select-none text-base sm:text-lg">
+
+    <!-- Header Principal Institucional -->
+    <header class="bg-slate-900/95 border-b border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between z-30 sticky top-0 backdrop-blur-md">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-r from-sky-500 to-emerald-500 p-2.5 rounded-xl text-white shadow-lg shadow-sky-500/20">
+                <i class="fa-solid fa-graduation-cap text-xl sm:text-2xl"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xs sm:text-sm font-extrabold px-2.5 py-0.5 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400">CENS N° 3-468</span>
+                    <span class="text-xs sm:text-sm font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">TIC 3° Año • EPJA</span>
+                </div>
+                <h1 class="text-sm sm:text-base md:text-lg lg:text-xl font-extrabold text-white tracking-wide mt-0.5">
+                    Búsquedas Digitales, IA y Criterios Críticos <span class="text-sky-400 hidden md:inline">• Prof. Nelson Garro</span>
+                </h1>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2 sm:space-x-3">
+            <!-- Volver al Portal -->
+            <a href="../../index.html" class="px-3 py-2 sm:px-4 sm:py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs sm:text-sm md:text-base rounded-xl transition flex items-center gap-2 shadow-md shadow-emerald-600/20" title="Volver al Portal de Actividades">
+                <i class="fa-solid fa-house"></i>
+                <span class="hidden md:inline">Portal</span>
+            </a>
+
+            <!-- Botón TP PDF -->
+            <button onclick="openTPModal()" class="px-3 py-2 sm:px-4 sm:py-2.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs sm:text-sm md:text-base rounded-xl transition flex items-center gap-2 shadow-md shadow-emerald-600/20">
+                <i class="fa-solid fa-file-pdf text-base"></i>
+                <span class="hidden sm:inline">TP 15 Preguntas (PDF)</span>
+            </button>
+
+            <!-- Botón Subir TP a Drive -->
+            <a href="https://drive.google.com/drive/folders/1tC7fQl-_jZeihX78jNkyPsulpHNM-1G5?usp=sharing" target="_blank" rel="noopener noreferrer" class="px-3 py-2 sm:px-4 sm:py-2.5 bg-amber-600 hover:bg-amber-500 active:scale-95 text-white font-bold text-xs sm:text-sm md:text-base rounded-xl transition flex items-center gap-2 shadow-md shadow-amber-600/20">
+                <i class="fa-solid fa-cloud-arrow-up text-base"></i>
+                <span class="hidden md:inline">Entregar TP (Drive)</span>
+            </a>
+
+            <!-- Botón Modo Docente -->
+            <button onclick="toggleTeacherNotes()" class="px-3 py-2 sm:px-4 sm:py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm md:text-base rounded-xl transition flex items-center gap-2 border border-slate-700" title="Notas Pedagógicas para la Clase">
+                <i class="fa-solid fa-chalkboard-user text-sky-400 text-base"></i>
+                <span class="hidden lg:inline">Notas Docente</span>
+            </button>
+
+            <!-- Botón Pantalla Completa -->
+            <button id="fullscreenBtn" onclick="toggleFullscreen()" class="px-3 py-2 sm:px-4 sm:py-2.5 bg-purple-600 hover:bg-purple-500 active:scale-95 text-white text-xs sm:text-sm md:text-base font-bold rounded-xl transition flex items-center gap-2 shadow-md shadow-purple-600/20" title="Ver presentación en pantalla completa">
+                <i id="fullscreenIcon" class="fa-solid fa-expand"></i>
+                <span class="fullscreen-label">Pantalla completa</span>
+            </button>
+
+            <!-- Botón Menú / Índice -->
+            <button onclick="toggleSlideMenu()" class="px-3 py-2 sm:px-4 sm:py-2.5 bg-sky-600 hover:bg-sky-500 text-white text-xs sm:text-sm md:text-base font-bold rounded-xl transition flex items-center gap-2 shadow-md">
+                <i class="fa-solid fa-layer-group"></i>
+                <span id="slideCounterBadge" class="font-mono">1 / 27</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal de la Aplicación -->
+    <main class="flex-1 relative overflow-hidden flex flex-col p-3 sm:p-5 w-full h-full">
+        
+        <!-- Pestañas de Navegación de Módulos -->
+        <nav class="flex items-center justify-center gap-2 sm:gap-4 mb-3 sm:mb-4 no-print overflow-x-auto pb-1 scrollbar-none">
+            <button onclick="switchTab('presentation')" id="tabBtnPresentation" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm sm:text-base md:text-lg font-bold transition flex items-center gap-2 bg-sky-600 text-white shadow-md">
+                <i class="fa-solid fa-desktop"></i> <span>Presentación</span>
+            </button>
+            <button onclick="switchTab('simulator')" id="tabBtnSimulator" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm sm:text-base md:text-lg font-semibold transition flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 hover:bg-slate-800">
+                <i class="fa-solid fa-terminal text-sky-400"></i> <span>Simulador Operadores</span>
+            </button>
+            <button onclick="switchTab('validator')" id="tabBtnValidator" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm sm:text-base md:text-lg font-semibold transition flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 hover:bg-slate-800">
+                <i class="fa-solid fa-shield-halved text-rose-400"></i> <span>Validador & Phishing</span>
+            </button>
+            <button onclick="switchTab('apa')" id="tabBtnAPA" class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-sm sm:text-base md:text-lg font-semibold transition flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 hover:bg-slate-800">
+                <i class="fa-solid fa-quote-right text-purple-400"></i> <span>Citas APA 7°</span>
+            </button>
+        </nav>
+
+        <!-- Viewport Dinámico del Contenido -->
+        <div id="appViewport" class="flex-1 bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl p-5 sm:p-8 md:p-10 flex flex-col justify-between overflow-y-auto relative slide-fade-in w-full min-h-0">
+            <!-- Inyectado dinámicamente vía JavaScript -->
+        </div>
+
+        <!-- Drawer de Notas Pedagógicas Docente -->
+        <aside id="teacherNotesDrawer" class="hidden absolute top-14 right-6 w-80 sm:w-[28rem] max-h-[85%] bg-slate-900/95 border border-sky-500/40 rounded-2xl shadow-2xl p-5 sm:p-6 z-40 backdrop-blur-xl overflow-y-auto">
+            <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
+                <h3 class="font-bold text-sky-400 text-sm sm:text-base md:text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-amber-400"></i> Orientación Pedagógica • Prof. Nelson Garro
+                </h3>
+                <button onclick="toggleTeacherNotes()" class="text-slate-400 hover:text-white p-1 text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="teacherNotesContent" class="text-sm sm:text-base text-slate-200 leading-relaxed space-y-3">
+                <!-- Se actualiza con cada diapositiva -->
+            </div>
+        </aside>
+
+        <!-- Modal Índice de Diapositivas -->
+        <div id="slideMenuModal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 sm:p-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-5xl w-full max-h-[88vh] p-6 flex flex-col shadow-2xl">
+                <div class="flex justify-between items-center pb-4 mb-4 border-b border-slate-800">
+                    <div>
+                        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-list-ul text-sky-400"></i> Índice de Clases • 27 Diapositivas
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-400">Selecciona cualquier tema para ir directamente a esa diapositiva</p>
+                    </div>
+                    <button onclick="toggleSlideMenu()" class="text-slate-400 hover:text-white text-xl p-1"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="slideGridContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 overflow-y-auto pr-1">
+                    <!-- Miniaturas generadas por JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Trabajo Práctico 15 Preguntas (PDF) -->
+        <div id="tpModal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-6">
+            <div class="bg-slate-900 border border-emerald-500/40 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+                <div class="bg-slate-800 px-6 py-4 border-b border-slate-700 flex flex-wrap justify-between items-center gap-3">
+                    <div>
+                        <h2 class="text-base sm:text-lg md:text-xl font-bold text-emerald-400 flex items-center gap-2">
+                            <i class="fa-solid fa-file-signature"></i> Trabajo Práctico Integrador • 15 Preguntas
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300">CENS N° 3-468 • TIC 3° Año • Prof. Nelson Garro</p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <a href="https://drive.google.com/drive/folders/1tC7fQl-_jZeihX78jNkyPsulpHNM-1G5?usp=sharing" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs sm:text-sm rounded-xl transition flex items-center gap-2 shadow">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> <span>Entregar en Drive</span>
+                        </a>
+                        <button onclick="printTP()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-xl transition flex items-center gap-2 shadow">
+                            <i class="fa-solid fa-print"></i> <span>Imprimir / PDF</span>
+                        </button>
+                        <button onclick="copyTPText()" class="px-3.5 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs sm:text-sm rounded-xl transition flex items-center gap-2 shadow">
+                            <i class="fa-solid fa-copy"></i> <span>Copiar Texto</span>
+                        </button>
+                        <button onclick="closeTPModal()" class="text-slate-400 hover:text-white text-xl p-1"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+
+                <div class="p-6 overflow-y-auto space-y-5 text-slate-200 text-sm sm:text-base leading-relaxed bg-slate-950/80" id="tpQuestionsList">
+                    <!-- Lista de 15 Preguntas renderizadas por JS -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Contenedor Estático para Impresión Limpia A4 -->
+    <div id="printableWorksheet" class="hidden">
+        <div style="font-family: Arial, Helvetica, sans-serif; max-width: 800px; margin: 0 auto; color: #000; line-height: 1.6;">
+            <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 18px;">
+                <h2 style="margin: 0; font-size: 20px; text-transform: uppercase;">CENS N° 3-468 • Educación de Jóvenes y Adultos</h2>
+                <h3 style="margin: 5px 0; font-size: 16px;">Materia: Tecnologías de la Información y la Comunicación (TIC 3° Año)</h3>
+                <p style="margin: 0; font-size: 14px; font-weight: bold;">Profesor: Nelson Garro • Ciclo Lectivo 2026</p>
+            </div>
+
+            <div style="margin-bottom: 18px; font-size: 13px;">
+                <p style="margin: 4px 0;"><strong>TRABAJO PRÁCTICO INTEGRADOR:</strong> Búsquedas Digitales, IA y Ciudadanía Crítica</p>
+                <p style="margin: 4px 0;"><strong>ESTUDIANTE:</strong> ____________________________________________________</p>
+                <p style="margin: 4px 0;"><strong>FECHA:</strong> ____ / ____ / ________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>CALIFICACIÓN:</strong> _________</p>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #ccc; margin: 15px 0;">
+
+            <h4 style="font-size: 14px; margin-bottom: 15px; text-transform: uppercase;">Cuestionario Evaluativo (15 Consignas):</h4>
+
+            <ol style="font-size: 12px; padding-left: 20px; line-height: 1.7;">
+                <li style="margin-bottom: 12px;"><strong>¿Cuál es la diferencia fundamental entre la escasez de información del pasado (libros impresos) y la "infoxicación" actual?</strong><div class="answer-line-print"></div></li>
+                <li style="margin-bottom: 12px;"><strong>Explica qué son las "arañas web" (bots) y cuál es su función en el rastreo e indización de páginas.</strong><div class="answer-line-print"></div></li>
+                <li style="margin-bottom: 12px;"><strong>¿Por qué los buscadores como Google no son totalmente "gratuitos"? Explica la diferencia entre resultados orgánicos y patrocinados.</strong><div class="answer-line-print"></div></li>
+                <li style="margin-bottom: 12px;"><strong>¿Qué es la "Burbuja de Filtro" y de qué manera puede condicionar o sesgar las noticias que ves a diario?</strong><div class="answer-line-print"></div></li>
+                <li style="margin-bottom: 12px;"><strong>Compara un buscador tradicional (Google) con un asistente de IA (ChatGPT/Gemini). ¿Cuándo conviene usar cada uno?</strong><div class="answer-line-print"></div></li>
+                <li style="margin-bottom: 12px;"><strong>¿Qué significa que una Inteligencia Artificial "alucine"? Menciona un riesgo de no verificar sus respuestas.</strong><div class="answer-line-print"></div></li>
+                <li style="margin-bottom: 12px;"><strong>Explica la utilidad del operador de frase exacta entre comillas <code>" "</code> y da un ejemplo práctico.</strong><div class="answer-line-print"></div></li>
+                <li style="margin-bottom: 12px;"><strong>¿Qué comandos o palabras clave combinarías para descargar un formulario oficial gubernamental en PDF (ej. ANSES/AFIP)?</strong><div class="answer-line-print"></div></li>
+                <li style="margin-bottom: 12px;"><strong>¿Cómo facilitan las búsquedas multimodales (por voz o cámara con Google Lens) el trabajo cotidiano de un adulto?</strong><div class="answer-line-print"></div></li>
+                <li style="margin-bottom: 12px;"><strong>Explica la "Regla de las 3 Fuentes" para validar si una información de Internet es fidedigna.</strong><div class="answer-line-print"></div></li>
+                <li style="margin-bottom: 12px;"><strong>¿Qué es el Phishing y qué pistas te permiten detectar un mensaje engañoso o estafa virtual?</strong><div class="answer-line-print"></div></li>
+                <li style="margin-bottom: 12px;"><strong>¿Por qué Wikipedia es un excelente punto de partida pero requiere revisar siempre su sección final de referencias?</strong><div class="answer-line-print"></div></li>
+                <li style="margin-bottom: 12px;"><strong>¿Qué importancia tienen las Normas APA y dar crédito a los autores en tus trabajos escolares del CENS?</strong><div class="answer-line-print"></div></li>
+                <li style="margin-bottom: 12px;"><strong>[Reflexión Personal]: En tu vida cotidiana o laboral, ¿cuál fue el trámite o búsqueda digital más difícil que tuviste que resolver y cómo lo lograste?</strong><div class="answer-line-print"></div></li>
+                <li style="margin-bottom: 12px;"><strong>[Reflexión Familiar/Comunitaria]: ¿Cómo puedes aplicar estos conocimientos para proteger tus datos y orientar a tus hijos o familiares mayores?</strong><div class="answer-line-print"></div></li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Footer con Barra de Navegación de Diapositivas -->
+    <footer class="bg-slate-900/95 border-t border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between z-20 sticky bottom-0">
+        <div class="flex items-center space-x-3">
+            <button onclick="prevSlide()" class="px-4 py-2 sm:px-5 sm:py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white rounded-xl text-xs sm:text-sm md:text-base font-semibold transition flex items-center gap-2 border border-slate-700">
+                <i class="fa-solid fa-chevron-left text-sm"></i> <span>Anterior</span>
+            </button>
+            <button onclick="nextSlide()" class="px-5 py-2 sm:px-6 sm:py-2.5 bg-sky-600 hover:bg-sky-500 active:scale-95 text-white rounded-xl text-xs sm:text-sm md:text-base font-semibold transition flex items-center gap-2 shadow-md shadow-sky-600/20">
+                <span>Siguiente</span> <i class="fa-solid fa-chevron-right text-sm"></i>
+            </button>
+        </div>
+
+        <div class="hidden sm:flex items-center space-x-1.5 flex-1 max-w-lg mx-6" id="progressBarContainer">
+            <!-- Puntos de progreso dinámicos -->
+        </div>
+
+        <div class="text-xs sm:text-sm text-slate-300 font-medium hidden md:block">
+            CENS N° 3-468 • Prof. Nelson Garro
+        </div>
+    </footer>
+
+    <!-- Toast de Notificaciones -->
+    <div id="toastNotification" class="hidden fixed bottom-16 right-6 bg-emerald-500 text-slate-950 font-bold text-xs sm:text-sm md:text-base px-5 py-3.5 rounded-xl shadow-2xl z-50 border border-emerald-300 transition"></div>
+
+    <script>
+        const slidesData = [
+            {
+                id: 1,
+                title: "Las Búsquedas Digitales, IA y Criterios Críticos",
+                subtitle: "Herramientas de pensamiento independiente para la era digital",
+                badge: "Unidad 2 • TIC 3° Año",
+                image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
+                type: "cover",
+                content: `
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto items-center">
+                        <div class="lg:col-span-7 space-y-5">
+                            <div class="flex flex-wrap gap-2.5">
+                                <span class="inline-block px-3.5 py-1 bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs sm:text-sm font-semibold rounded-full">CENS N° 3-468 • Mendoza</span>
+                                <span class="inline-block px-3.5 py-1 bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs sm:text-sm font-semibold rounded-full">Prof. Nelson Garro</span>
+                            </div>
+                            <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
+                                Las Búsquedas en Internet, Inteligencia Artificial y Criterio Crítico
+                            </h1>
+                            <p class="text-slate-200 text-base sm:text-lg md:text-xl leading-relaxed">
+                                Aprender a buscar en la adultez no es solo escribir palabras en Google: es desarrollar autonomía para realizar trámites, resolver desafíos laborales, estudiar y proteger nuestra privacidad y la de nuestra familia.
+                            </p>
+                            <div class="pt-2 flex flex-wrap gap-4 items-center">
+                                <button onclick="nextSlide()" class="px-5 py-3 bg-sky-500 hover:bg-sky-400 text-white font-bold text-sm sm:text-base md:text-lg rounded-xl shadow-lg transition flex items-center gap-2">
+                                    Iniciar Clase Interactiva <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                                <span class="text-sm sm:text-base text-slate-300 flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i> Cátedra TIC 2026</span>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-5 relative h-56 sm:h-64 lg:h-80 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
+                            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1000&auto=format&fit=crop" alt="Búsquedas e IA" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Inicie valorando la experiencia previa del alumno adulto: la vida práctica los ha hecho analíticos, ahora trasladaremos ese juicio crítico al entorno digital."
+            },
+            {
+                id: 2,
+                title: "La Educación Digital en la Adultez (EPJA)",
+                badge: "Contexto y Propósito",
+                image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=1000&auto=format&fit=crop",
+                imageHeight: "h-28 sm:h-36",
+                type: "split",
+                content: `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
+                        <div class="bg-slate-950/80 p-5 rounded-2xl border border-slate-800 space-y-3">
+                            <div class="flex items-center gap-2.5 text-sky-400 font-bold text-base sm:text-lg">
+                                <i class="fa-solid fa-user-shield text-xl"></i>
+                                <h3>Superar el Mito: "Llegué Tarde a la Tecnología"</h3>
+                            </div>
+                            <p class="text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                                Muchos adultos sienten temor a equivocarse o "romper algo". La informática moderna es intuitiva. El verdadero valor no es presionar botones, sino tener criterio.
+                            </p>
+                            <ul class="text-sm sm:text-base text-slate-300 space-y-1.5 list-disc list-inside">
+                                <li><strong>Autonomía:</strong> Trámites personales sin intermediarios.</li>
+                                <li><strong>Inclusión Laboral:</strong> Resolver tareas con software moderno.</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-slate-950/80 p-5 rounded-2xl border border-slate-800 space-y-3">
+                            <div class="flex items-center gap-2.5 text-emerald-400 font-bold text-base sm:text-lg">
+                                <i class="fa-solid fa-brain text-xl"></i>
+                                <h3>La Ventaja del Estudiante Adulto</h3>
+                            </div>
+                            <p class="text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                                El estudiante del CENS aporta experiencia de vida. Sabes detectar ofertas engañosas o trámites dudosos. Esa prudencia es la base de la Ciudadanía Digital.
+                            </p>
+                            <div class="bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/30 text-xs sm:text-sm md:text-base text-emerald-300">
+                                <i class="fa-solid fa-quote-left mr-1"></i> La tecnología es el medio; tu sentido común es la herramienta principal.
+                            </div>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Pregunte al grupo qué trámite o búsqueda les costó más resolver en el último mes para orientar la clase."
+            },
+            {
+                id: 3,
+                title: "Historia del Acceso a la Información: El Ayer",
+                badge: "Evolución Histórica",
+                image: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=1000&auto=format&fit=crop",
+                type: "split",
+                content: `
+                    <div class="space-y-5">
+                        <p class="text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                            Antes de Internet, el conocimiento estaba contenido en soportes físicos. Encontrar un dato requería desplazamiento físico y revisión de índices en papel.
+                        </p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2">
+                                <div class="text-amber-400 text-3xl"><i class="fa-solid fa-book-atlas"></i></div>
+                                <h4 class="font-bold text-white text-base sm:text-lg">Enciclopedias y Libros</h4>
+                                <p class="text-xs sm:text-sm md:text-base text-slate-300">Tomos impresos que requerían presupuestos elevados para actualización.</p>
+                            </div>
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2">
+                                <div class="text-amber-400 text-3xl"><i class="fa-solid fa-building-columns"></i></div>
+                                <h4 class="font-bold text-white text-base sm:text-lg">Bibliotecas y Ficheros</h4>
+                                <p class="text-xs sm:text-sm md:text-base text-slate-300">Catálogos temáticos por autor y materia clasificados manualmente.</p>
+                            </div>
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2">
+                                <div class="text-amber-400 text-3xl"><i class="fa-solid fa-newspaper"></i></div>
+                                <h4 class="font-bold text-white text-base sm:text-lg">Hemerotecas</h4>
+                                <p class="text-xs sm:text-sm md:text-base text-slate-300">Búsqueda de normativas o prensa revisando tomos hoja por hoja.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Destaque que las publicaciones impresas contaban con filtros editoriales estrictos que reducían los errores accidentales masivos."
+            },
+            {
+                id: 4,
+                title: "El Panorama Actual: De la Escasez a la Infoxicación",
+                badge: "Desafío Moderno",
+                image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1000&auto=format&fit=crop",
+                imageHeight: "h-28 sm:h-36",
+                type: "split",
+                content: `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
+                        <div class="bg-slate-950/80 p-5 rounded-2xl border border-slate-800 space-y-3">
+                            <span class="px-2.5 py-1 bg-amber-500/20 text-amber-400 text-xs sm:text-sm font-bold rounded">El Pasado</span>
+                            <h3 class="text-base sm:text-lg md:text-xl font-bold text-white">Escasez de Datos</h3>
+                            <p class="text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                                El dilema era <strong>¿dónde conseguir la fuente?</strong> Si el libro no estaba en la biblioteca, la investigación se detenía.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-950/80 p-5 rounded-2xl border border-sky-500/30 space-y-3">
+                            <span class="px-2.5 py-1 bg-sky-500/20 text-sky-400 text-xs sm:text-sm font-bold rounded">El Presente</span>
+                            <h3 class="text-base sm:text-lg md:text-xl font-bold text-white">Infoxicación (Sobrecarga de Datos)</h3>
+                            <p class="text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                                El dilema actual es <strong>¿cómo validar entre millones de respuestas?</strong> Sufrimos un exceso de datos con publicidad y noticias no contrastadas.
+                            </p>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Defina 'Infoxicación' como la saturación de información que genera confusión al momento de tomar decisiones."
+            },
+            {
+                id: 5,
+                title: "¿Qué es y cómo funciona un Buscador Web?",
+                badge: "Arquitectura Informática",
+                image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1000&auto=format&fit=crop",
+                type: "process",
+                content: `
+                    <div class="space-y-5">
+                        <p class="text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                            Un motor de búsqueda consulta un <strong>índice precalculado</strong> previamente indexado por sus algoritmos.
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+                            <div class="bg-slate-950 p-5 rounded-xl border border-sky-500/30 space-y-2.5">
+                                <div class="w-10 h-10 bg-sky-500/20 text-sky-400 rounded-lg flex items-center justify-center font-bold text-sm sm:text-base">1</div>
+                                <h4 class="font-bold text-white text-base sm:text-lg">Rastreo (Crawling)</h4>
+                                <p class="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed">Programas automáticos (bots o arañas) recorren hipervínculos analizando sitios.</p>
+                            </div>
+                            <div class="bg-slate-950 p-5 rounded-xl border border-sky-500/30 space-y-2.5">
+                                <div class="w-10 h-10 bg-sky-500/20 text-sky-400 rounded-lg flex items-center justify-center font-bold text-sm sm:text-base">2</div>
+                                <h4 class="font-bold text-white text-base sm:text-lg">Indización</h4>
+                                <p class="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed">Clasifican palabras clave ordenándolas en una base de datos global.</p>
+                            </div>
+                            <div class="bg-slate-950 p-5 rounded-xl border border-sky-500/30 space-y-2.5">
+                                <div class="w-10 h-10 bg-sky-500/20 text-sky-400 rounded-lg flex items-center justify-center font-bold text-sm sm:text-base">3</div>
+                                <h4 class="font-bold text-white text-base sm:text-lg">Ranking de Resultados</h4>
+                                <p class="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed">Algoritmos ordenan respuestas midiendo relevancia, velocidad y anuncios pagados.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Utilice la analogía del bibliotecario que armó un fichero gigantesco con anticipación."
+            },
+            {
+                id: 6,
+                title: "Los Motores de Búsqueda Más Utilizados",
+                badge: "Plataformas",
+                image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1000&auto=format&fit=crop",
+                type: "grid",
+                content: `
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <div class="flex items-center gap-2.5 text-sky-400 font-bold text-base sm:text-lg">
+                                <i class="fa-brands fa-google text-2xl"></i> Google
+                            </div>
+                            <p class="text-xs sm:text-sm md:text-base text-slate-200 leading-relaxed">Líder mundial. Destaca por velocidad y adaptación geográfica local.</p>
+                        </div>
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <div class="flex items-center gap-2.5 text-blue-400 font-bold text-base sm:text-lg">
+                                <i class="fa-brands fa-microsoft text-2xl"></i> Microsoft Bing
+                            </div>
+                            <p class="text-xs sm:text-sm md:text-base text-slate-200 leading-relaxed">Integrado en Windows. Incorpora Copilot (IA) para redactar resúmenes en la búsqueda.</p>
+                        </div>
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <div class="flex items-center gap-2.5 text-emerald-400 font-bold text-base sm:text-lg">
+                                <i class="fa-solid fa-shield-cat text-2xl"></i> DuckDuckGo
+                            </div>
+                            <p class="text-xs sm:text-sm md:text-base text-slate-200 leading-relaxed">Focalizado en privacidad. No almacena tu dirección IP ni historial comercial.</p>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Aclare que existen alternativas orientadas a la privacidad más allá de Google."
+            },
+            {
+                id: 7,
+                title: "El Modelo de Negocio: Anuncios y Patrocinados",
+                badge: "Economía Digital",
+                image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1000&auto=format&fit=crop",
+                type: "split",
+                content: `
+                    <div class="space-y-5">
+                        <div class="bg-amber-500/10 border border-amber-500/30 p-5 rounded-xl text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                            <strong>¿Por qué las herramientas son gratuitas?</strong> "Si no estás pagando por el producto, el producto eres tú". Los buscadores se financian vendiendo publicidad orientada.
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-amber-400 text-base sm:text-lg flex items-center gap-2">
+                                    <i class="fa-solid fa-rectangle-ad text-xl"></i> Resultados Patrocinados (Anuncios)
+                                </h4>
+                                <p class="text-sm sm:text-base text-slate-300 leading-relaxed">Aparecen primeros destacados con la etiqueta "Patrocinado". Las empresas pagan por ese lugar.</p>
+                            </div>
+
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-sky-400 text-base sm:text-lg flex items-center gap-2">
+                                    <i class="fa-solid fa-diagram-project text-xl"></i> Resultados Orgánicos
+                                </h4>
+                                <p class="text-sm sm:text-base text-slate-300 leading-relaxed">Páginas ordenadas por la calidad y relevancia del contenido según el algoritmo, sin pagos.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Muestre cómo diferenciar visualmente un anuncio de un resultado orgánico para evitar ingresar por error a webs comerciales."
+            },
+            {
+                id: 8,
+                title: "Privacidad, Rastreo y la 'Burbuja de Filtro'",
+                badge: "Seguridad Digital",
+                image: "https://images.unsplash.com/photo-1510511459019-5dda7724fd87?q=80&w=1000&auto=format&fit=crop",
+                type: "split",
+                content: `
+                    <div class="space-y-5">
+                        <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3">
+                            <h3 class="font-bold text-sky-400 text-base sm:text-lg md:text-xl flex items-center gap-2.5">
+                                <i class="fa-solid fa-filter-circle-xmark"></i> ¿Qué es la "Burbuja de Filtro"?
+                            </h3>
+                            <p class="text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                                Los buscadores registran tu ubicación, historial y gustos para adaptar las respuestas a tus preferencias previas.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="bg-slate-950 p-5 rounded-xl border border-rose-500/30 space-y-2">
+                                <h4 class="font-bold text-rose-400 text-base sm:text-lg">El Riesgo</h4>
+                                <p class="text-sm sm:text-base text-slate-300 leading-relaxed">Limita la visión de opiniones diversas y te expone a publicidad altamente dirigida.</p>
+                            </div>
+                            <div class="bg-slate-950 p-5 rounded-xl border border-emerald-500/30 space-y-2">
+                                <h4 class="font-bold text-emerald-400 text-base sm:text-lg">La Prevención</h4>
+                                <p class="text-sm sm:text-base text-slate-300 leading-relaxed">Navegar en modo de incógnito o limpiar cookies frecuentemente.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Explique cómo los rastreadores de cookies conectan búsquedas web con anuncios en redes sociales."
+            },
+            {
+                id: 9,
+                title: "Búsqueda en la Era de la Inteligencia Artificial",
+                badge: "Tendencias 2026",
+                image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1000&auto=format&fit=crop",
+                type: "split",
+                content: `
+                    <div class="space-y-5">
+                        <p class="text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                            Hoy interactuamos con <strong>Modelos de Lenguaje (LLMs)</strong> capaces de redactar resúmenes explicativos personalizados.
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="bg-slate-950 p-5 rounded-xl border border-sky-500/30 space-y-2.5">
+                                <div class="flex items-center gap-2 font-bold text-sky-400 text-base sm:text-lg">
+                                    <i class="fa-solid fa-brain"></i> Gemini / ChatGPT / Copilot
+                                </div>
+                                <p class="text-sm sm:text-base text-slate-300 leading-relaxed">Procesan lenguaje natural, leen múltiples fuentes y generan una síntesis estructurada.</p>
+                            </div>
+
+                            <div class="bg-slate-950 p-5 rounded-xl border border-purple-500/30 space-y-2.5">
+                                <div class="flex items-center gap-2 font-bold text-purple-400 text-base sm:text-lg">
+                                    <i class="fa-solid fa-magnifying-glass-chart"></i> Buscadores Híbridos (Perplexity)
+                                </div>
+                                <p class="text-sm sm:text-base text-slate-300 leading-relaxed">Redactan respuestas e indican enlaces explícitos para verificar cada afirmación.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Resalte la diferencia entre buscar palabras clave y redactar prompts contextuales."
+            },
+            {
+                id: 10,
+                title: "Cuadro Comparativo: Buscador Web vs. Motor de IA",
+                badge: "Análisis Crítico",
+                image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop",
+                type: "split",
+                content: `
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm sm:text-base md:text-lg text-slate-200 border-collapse">
+                            <thead>
+                                <tr class="bg-slate-800 text-white font-bold border-b border-slate-700">
+                                    <th class="p-3.5">Característica</th>
+                                    <th class="p-3.5 text-sky-400">Buscador Tradicional</th>
+                                    <th class="p-3.5 text-purple-400">Asistente de IA</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800">
+                                <tr>
+                                    <td class="p-3.5 font-semibold text-white">Resultado</td>
+                                    <td class="p-3.5">Lista de enlaces web.</td>
+                                    <td class="p-3.5">Texto redactado a medida.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3.5 font-semibold text-white">Riesgo principal</td>
+                                    <td class="p-3.5">Sitios comerciales o no seguros.</td>
+                                    <td class="p-3.5"><strong>"Alucinaciones"</strong> (inventar datos).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3.5 font-semibold text-white">Uso recomendado</td>
+                                    <td class="p-3.5">Trámites oficiales, leyes, ubicaciones.</td>
+                                    <td class="p-3.5">Resúmenes, conceptos, ideas iniciales.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `,
+                teacherNotes: "Enfatice que la IA funciona como asistente preliminar y no reemplaza la lectura humana."
+            },
+            {
+                id: 11,
+                title: "Palabras Clave: El Lenguaje del Buscador",
+                badge: "Técnica de Búsqueda",
+                image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1000&auto=format&fit=crop",
+                type: "split",
+                content: `
+                    <div class="space-y-5">
+                        <p class="text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                            Para obtener precisión, utilizamos <strong>sustantivos y conceptos clave</strong> eliminando conectores innecesarios.
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="bg-rose-500/10 border border-rose-500/30 p-5 rounded-xl space-y-2.5">
+                                <span class="text-sm sm:text-base font-bold text-rose-400"><i class="fa-solid fa-circle-xmark mr-1"></i> Búsqueda Ineficiente</span>
+                                <div class="bg-slate-950 p-3.5 rounded text-xs sm:text-sm md:text-base font-mono text-slate-300">"Hola quisiera saber cuáles son los requisitos para el carnet de conducir en Mendoza"</div>
+                            </div>
+
+                            <div class="bg-emerald-500/10 border border-emerald-500/30 p-5 rounded-xl space-y-2.5">
+                                <span class="text-sm sm:text-base font-bold text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i> Búsqueda Eficiente</span>
+                                <div class="bg-slate-950 p-3.5 rounded text-xs sm:text-sm md:text-base font-mono text-emerald-300">requisitos licencia conducir mendoza site:.gob.ar</div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Pruebe en el aula la fórmula: Sustantivo + Contexto geográfico + Dominio."
+            },
+            {
+                id: 12,
+                title: "Simulador de Sintaxis y Operadores",
+                badge: "Taller Práctico",
+                image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1000&auto=format&fit=crop",
+                type: "interactive-sim",
+                content: `
+                    <div class="space-y-5">
+                        <p class="text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                            Haz clic en los botones de prueba para observar cómo cambian los operadores avanzados de búsqueda:
+                        </p>
+
+                        <div class="bg-slate-950 p-5 rounded-2xl border border-sky-500/30 space-y-4">
+                            <div class="flex flex-wrap gap-2.5">
+                                <button onclick="runSim('exact')" class="px-3.5 py-2 bg-slate-800 hover:bg-sky-600 active:scale-95 text-xs sm:text-sm md:text-base rounded-lg text-slate-200 font-mono transition">"Frase exacta"</button>
+                                <button onclick="runSim('exclude')" class="px-3.5 py-2 bg-slate-800 hover:bg-sky-600 active:scale-95 text-xs sm:text-sm md:text-base rounded-lg text-slate-200 font-mono transition">-Excluir palabra</button>
+                                <button onclick="runSim('site')" class="px-3.5 py-2 bg-slate-800 hover:bg-sky-600 active:scale-95 text-xs sm:text-sm md:text-base rounded-lg text-slate-200 font-mono transition">site:.gob.ar</button>
+                                <button onclick="runSim('file')" class="px-3.5 py-2 bg-slate-800 hover:bg-sky-600 active:scale-95 text-xs sm:text-sm md:text-base rounded-lg text-slate-200 font-mono transition">filetype:pdf</button>
+                            </div>
+
+                            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-sm sm:text-base md:text-lg flex items-center gap-2">
+                                <i class="fa-solid fa-terminal text-sky-400"></i>
+                                <span id="simQueryText" class="text-sky-300">"educacion secundaria de adultos" site:.edu.ar</span>
+                            </div>
+
+                            <div id="simResultBox" class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 text-xs sm:text-sm md:text-base text-slate-200 leading-relaxed">
+                                <p class="text-emerald-400 font-bold"><i class="fa-solid fa-check mr-1"></i> Busca la frase exacta únicamente en servidores educativos oficiales.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Invita a los alumnos a probar estos operadores desde los navegadores de sus celulares."
+            },
+            {
+                id: 13,
+                title: "Búsqueda de Información Oficial y Trámites",
+                badge: "Uso Ciudadano",
+                image: "https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=1000&auto=format&fit=crop",
+                type: "grid",
+                content: `
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <div class="flex items-center gap-2.5 font-bold text-sky-400 text-base sm:text-lg">
+                                <i class="fa-solid fa-building-columns text-2xl"></i> Dominio .gob.ar / .gov.ar
+                            </div>
+                            <p class="text-xs sm:text-sm md:text-base text-slate-200 leading-relaxed">Garantiza fuentes estatales (ANSES, AFIP, Ministerios) previniendo intermediarios pagos.</p>
+                        </div>
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-3">
+                            <div class="flex items-center gap-2.5 font-bold text-emerald-400 text-base sm:text-lg">
+                                <i class="fa-solid fa-file-pdf text-2xl"></i> Comando filetype:pdf
+                            </div>
+                            <p class="text-xs sm:text-sm md:text-base text-slate-200 leading-relaxed">Ideal para descargar formularios oficiales, leyes y documentos normativos.</p>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Alerta importante: El Estado Nacional utiliza exclusivamente la extensión `.gob.ar`."
+            },
+            {
+                id: 14,
+                title: "Búsquedas Multimodales: La Voz como Herramienta",
+                badge: "Accesibilidad",
+                image: "https://images.unsplash.com/photo-1589254065878-42c9da997008?q=80&w=1000&auto=format&fit=crop",
+                type: "split",
+                content: `
+                    <div class="space-y-5">
+                        <p class="text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                            La búsqueda por voz mediante el micrófono del celular facilita la interacción cuando no se prefiere escribir en teclados táctiles pequeños.
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2.5">
+                                <h4 class="font-bold text-sky-400 text-base sm:text-lg flex items-center gap-2">
+                                    <i class="fa-solid fa-microphone text-xl"></i> Reconocimiento e IA
+                                </h4>
+                                <p class="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed">Modelos de IA interpretan modulación e intención del mensaje expresado.</p>
+                            </div>
+
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2.5">
+                                <h4 class="font-bold text-emerald-400 text-base sm:text-lg flex items-center gap-2">
+                                    <i class="fa-solid fa-universal-access text-xl"></i> Entorno Laboral
+                                </h4>
+                                <p class="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed">Permite buscar esquemas o manuales mientras se ejecutan tareas operativas.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Efectúe una prueba de voz pidiendo al celular rutas o datos del CENS N° 3-468."
+            },
+            {
+                id: 15,
+                title: "Búsqueda Visual con Google Lens",
+                badge: "Herramienta Práctica",
+                image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1000&auto=format&fit=crop",
+                type: "grid",
+                content: `
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2.5">
+                            <div class="text-sky-400 text-2xl sm:text-3xl"><i class="fa-solid fa-camera"></i></div>
+                            <h4 class="font-bold text-white text-base sm:text-lg">Identificación de Objetos</h4>
+                            <p class="text-xs sm:text-sm md:text-base text-slate-300">Enfoca componentes mecánicos o plantas para conocer su nombre exacto.</p>
+                        </div>
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2.5">
+                            <div class="text-emerald-400 text-2xl sm:text-3xl"><i class="fa-solid fa-font"></i></div>
+                            <h4 class="font-bold text-white text-base sm:text-lg">Extraer Texto impreso</h4>
+                            <p class="text-xs sm:text-sm md:text-base text-slate-300">Fotografía un papel para copiar el texto directamente a Word o WhatsApp.</p>
+                        </div>
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2.5">
+                            <div class="text-purple-400 text-2xl sm:text-3xl"><i class="fa-solid fa-language"></i></div>
+                            <h4 class="font-bold text-white text-base sm:text-lg">Traducción Instantánea</h4>
+                            <p class="text-xs sm:text-sm md:text-base text-slate-300">Apunta con la cámara a carteles o manuales en otro idioma para ver la traducción.</p>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "La función de copiar texto desde papel a la pantalla mediante la cámara es muy útil en tareas escolares."
+            },
+            {
+                id: 16,
+                title: "Traducción Automática e Inclusión Lingüística",
+                badge: "Servicios Web",
+                image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop",
+                type: "split",
+                content: `
+                    <div class="space-y-5">
+                        <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3">
+                            <h3 class="font-bold text-sky-400 text-base sm:text-lg md:text-xl flex items-center gap-2.5">
+                                <i class="fa-solid fa-language"></i> Romper Barreras del Idioma
+                            </h3>
+                            <p class="text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                                Traductores basados en redes neuronales (Google Translate, DeepL) permiten traducir documentos completos respetando el contexto.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-sm sm:text-base space-y-1.5">
+                                <span class="font-bold text-emerald-400"><i class="fa-solid fa-file-lines mr-1"></i> Traducción de Archivos</span>
+                                <p class="text-slate-300">Sube archivos PDF manteniendo el formato visual original.</p>
+                            </div>
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-sm sm:text-base space-y-1.5">
+                                <span class="font-bold text-sky-400"><i class="fa-solid fa-ear-listen mr-1"></i> Conversación Bilingüe</span>
+                                <p class="text-slate-300">Facilita diálogos en directo traduciendo audio bidireccional.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Recuerde que los modismos locales requieren revisión humana en escritos formales."
+            },
+            {
+                id: 17,
+                title: "Validación de Información: El Criterio Crítico",
+                badge: "Evaluación de Fuentes",
+                image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1000&auto=format&fit=crop",
+                type: "split",
+                content: `
+                    <div class="space-y-5">
+                        <div class="bg-amber-500/10 border border-amber-500/30 p-5 rounded-xl text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                            <strong>"Internet NO es una biblioteca respaldada"</strong>. Coexisten publicaciones con rigor académico junto a información falsa o no verificada.
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-rose-400 text-base sm:text-lg flex items-center gap-2">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Clickbait (Titulares Sensacionalistas)
+                                </h4>
+                                <p class="text-sm sm:text-base text-slate-300 leading-relaxed">Títulos exaggeratedos diseñados para captar clics e ingresos publicitarios.</p>
+                            </div>
+
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-amber-400 text-base sm:text-lg flex items-center gap-2">
+                                    <i class="fa-solid fa-mask"></i> Intención del Autor
+                                </h4>
+                                <p class="text-sm sm:text-base text-slate-300 leading-relaxed">Pregúntate si el portal busca informar, vender o influir de forma interesada.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Fomente la costumbre de consultar fuentes antes de compartir publicaciones en grupos de WhatsApp."
+            },
+            {
+                id: 18,
+                title: "Peligros Digitales: Fake News y Phishing",
+                badge: "Seguridad Ciudadana",
+                image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1000&auto=format&fit=crop",
+                type: "interactive-scam",
+                content: `
+                    <div class="space-y-5">
+                        <p class="text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                            Haz clic sobre los siguientes casos para aprender a identificar estafas virtuales:
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div onclick="checkScam('fake')" class="bg-slate-950 p-5 rounded-xl border border-slate-800 cursor-pointer hover:border-rose-500 transition space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs sm:text-sm font-bold text-rose-400">Caso A</span>
+                                    <i class="fa-solid fa-envelope-open-text text-slate-400 text-lg"></i>
+                                </div>
+                                <p class="text-xs sm:text-sm md:text-base font-mono bg-slate-900 p-3 rounded leading-relaxed">"¡URGENTE ANSES! Ingrese a www.anses-cobro-subsidio.com para retirar $150.000."</p>
+                                <span class="text-xs sm:text-sm text-sky-400 font-semibold block">Evaluar riesgo →</span>
+                            </div>
+
+                            <div onclick="checkScam('official')" class="bg-slate-950 p-5 rounded-xl border border-slate-800 cursor-pointer hover:border-emerald-500 transition space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs sm:text-sm font-bold text-emerald-400">Caso B</span>
+                                    <i class="fa-solid fa-building-columns text-slate-400 text-lg"></i>
+                                </div>
+                                <p class="text-xs sm:text-sm md:text-base font-mono bg-slate-900 p-3 rounded leading-relaxed">"Cronograma de pagos oficial disponible en www.anses.gob.ar/consultas"</p>
+                                <span class="text-xs sm:text-sm text-sky-400 font-semibold block">Evaluar riesgo →</span>
+                            </div>
+                        </div>
+
+                        <div id="scamFeedback" class="hidden p-4 rounded-xl text-xs sm:text-sm md:text-base font-semibold leading-relaxed"></div>
+                    </div>
+                `,
+                teacherNotes: "Muestre cómo el enlace `.com` suplanta la identidad oficial de ANSES (`.gob.ar`)."
+            },
+            {
+                id: 19,
+                title: "Alucinaciones de la IA y Sesgos Algorítmicos",
+                badge: "Riesgos de la IA",
+                image: "https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=1000&auto=format&fit=crop",
+                type: "split",
+                content: `
+                    <div class="space-y-5">
+                        <div class="bg-purple-500/10 border border-purple-500/30 p-5 rounded-xl text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                            <strong>¿Qué es una "Alucinación" de la Inteligencia Artificial?</strong> Ocurre cuando un bot inventa un dato, ley o cita bibliográfica redactándola con seguridad formal.
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-amber-400 text-base sm:text-lg flex items-center gap-2">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Causa Técnica
+                                </h4>
+                                <p class="text-sm sm:text-base text-slate-300 leading-relaxed">La IA predice probabilísticamente secuencias de palabras coherentes sin verificar la veracidad real.</p>
+                            </div>
+
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2">
+                                <h4 class="font-bold text-emerald-400 text-base sm:text-lg flex items-center gap-2">
+                                    <i class="fa-solid fa-shield"></i> Verificación
+                                </h4>
+                                <p class="text-sm sm:text-base text-slate-300 leading-relaxed">Constatar fechas, leyes y datos numéricos en portales estatales directos.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Mencione la importancia de no copiar leyes ni normativas generadas por IA sin previa verificación."
+            },
+            {
+                id: 20,
+                title: "Triangulación y Contraste de Fuentes",
+                badge: "Metodología",
+                image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1000&auto=format&fit=crop",
+                type: "process",
+                content: `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-slate-950 p-5 rounded-xl border border-sky-500/40 space-y-2.5">
+                            <div class="text-sky-400 font-bold text-base sm:text-lg flex items-center gap-2">
+                                <i class="fa-solid fa-code-compare text-lg"></i> 1. Regla de las 3 Fuentes
+                            </div>
+                            <p class="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed">Comprobar que al menos 3 sitios independientes afirmen el mismo dato sin copiarse.</p>
+                        </div>
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-sky-500/40 space-y-2.5">
+                            <div class="text-sky-400 font-bold text-base sm:text-lg flex items-center gap-2">
+                                <i class="fa-solid fa-user-check text-lg"></i> 2. Autoría Reconocida
+                            </div>
+                            <p class="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed">Revisar firma institucional o especialista responsable de la redacción.</p>
+                        </div>
+
+                        <div class="bg-slate-950 p-5 rounded-xl border border-sky-500/40 space-y-2.5">
+                            <div class="text-sky-400 font-bold text-base sm:text-lg flex items-center gap-2">
+                                <i class="fa-solid fa-calendar-check text-lg"></i> 3. Fecha Actualizada
+                            </div>
+                            <p class="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed">Verificar la fecha de publicación para evitar tomar noticias antiguas como actuales.</p>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "La triangulación es el método principal utilizado por periodistas para validar información."
+            },
+            {
+                id: 21,
+                title: "Wikipedia en la Educación de Adultos",
+                badge: "Uso Académico",
+                image: "https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=1000&auto=format&fit=crop",
+                type: "split",
+                content: `
+                    <div class="space-y-5">
+                        <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 flex items-start gap-4">
+                            <div class="p-3 bg-slate-900 text-white rounded-xl text-3xl font-serif">W</div>
+                            <div class="space-y-1">
+                                <h4 class="font-bold text-white text-base sm:text-lg">Construcción Colaborativa</h4>
+                                <p class="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed">Enciclopedia libre con millones de artículos editados y corregidos por la comunidad.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-xl text-xs sm:text-sm md:text-base space-y-1.5">
+                                <span class="font-bold text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i> Punto de Partida</span>
+                                <p class="text-slate-200">Ideal para obtener un resumen del tema y consultar sus <strong>Referencias finales</strong>.</p>
+                            </div>
+
+                            <div class="bg-rose-500/10 border border-rose-500/30 p-4 rounded-xl text-xs sm:text-sm md:text-base space-y-1.5">
+                                <span class="font-bold text-rose-400"><i class="fa-solid fa-circle-xmark mr-1"></i> Uso Inadecuado</span>
+                                <p class="text-slate-200">Copiar y pegar sin leer o utilizarla como única cita bibliográfica entregable.</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Enseñe a revisar el historial de discusión y la bibliografía al pie de cada artículo."
+            },
+            {
+                id: 22,
+                title: "Registro de Fuentes y Generador APA 7.ª Edición",
+                badge: "Citas Bibliográficas",
+                image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1000&auto=format&fit=crop",
+                type: "interactive-apa",
+                content: `
+                    <div class="space-y-5">
+                        <p class="text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                            Citar otorga solidez a los trabajos del CENS y respeta los derechos de autoría. Prueba generar una cita APA aquí:
+                        </p>
+
+                        <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <input id="apaAuthor" type="text" placeholder="Autor (Ej: Garro, N.)" class="bg-slate-900 border border-slate-700 text-xs sm:text-sm md:text-base text-white p-3 rounded-xl focus:outline-none focus:border-sky-500">
+                                <input id="apaYear" type="text" placeholder="Año (Ej: 2026)" class="bg-slate-900 border border-slate-700 text-xs sm:text-sm md:text-base text-white p-3 rounded-xl focus:outline-none focus:border-sky-500">
+                                <input id="apaTitle" type="text" placeholder="Título de la publicación" class="bg-slate-900 border border-slate-700 text-xs sm:text-sm md:text-base text-white p-3 rounded-xl focus:outline-none focus:border-sky-500">
+                            </div>
+                            <button onclick="generateAPA()" class="w-full py-3 bg-sky-600 hover:bg-sky-500 text-xs sm:text-sm md:text-base text-white font-bold rounded-xl transition">Generar Referencia APA</button>
+
+                            <div id="apaOutput" class="bg-slate-900 p-4 rounded-xl border border-slate-800 text-xs sm:text-sm md:text-base font-mono text-emerald-400 break-all">
+                                Completa los campos arriba para visualizar el formato normativo.
+                            </div>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Citar adecuadamente evita el plagio académico en los trabajos evaluativos de la secundaria de adultos."
+            },
+            {
+                id: 23,
+                title: "Cultura Digital en el Hogar y la Comunidad",
+                badge: "Intercambio Familiar",
+                image: "https://images.unsplash.com/photo-1511895426328-dc8714191300?q=80&w=1000&auto=format&fit=crop",
+                type: "split",
+                content: `
+                    <div class="space-y-5">
+                        <div class="bg-sky-500/10 border border-sky-500/30 p-5 rounded-xl text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                            <h4 class="font-bold text-sky-400 mb-2"><i class="fa-solid fa-comments mr-1"></i> Pregunta para Conversar en Casa</h4>
+                            <p class="leading-relaxed">
+                                Pregunta a tus familiares: <strong>¿Cómo resolvían las investigaciones escolares o la búsqueda laboral antes de existir Internet?</strong>
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2 text-xs sm:text-sm md:text-base">
+                                <span class="font-bold text-amber-400">Comparativa:</span>
+                                <ul class="list-disc list-inside text-slate-300 space-y-1.5 mt-1.5">
+                                    <li>Anuncios clasificados impresos vs. portales web.</li>
+                                    <li>Guías telefónicas en papel vs. buscadores GPS.</li>
+                                </ul>
+                            </div>
+
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2 text-xs sm:text-sm md:text-base">
+                                <span class="font-bold text-emerald-400">Reflexión:</span>
+                                <p class="text-slate-300 leading-relaxed mt-1.5">¿Qué ganamos en inmediatez y qué perdimos en paciencia o verificación personal?</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Fomente la integración intergeneracional de los contenidos del CENS en el hogar."
+            },
+            {
+                id: 24,
+                title: "Taller Interactivo 1: Caso de Búsqueda Normativa",
+                badge: "Caso Práctico",
+                type: "interactive-case",
+                content: `
+                    <div class="space-y-5">
+                        <div class="bg-slate-950 p-5 rounded-2xl border border-sky-500/30 space-y-2">
+                            <h4 class="font-bold text-sky-400 text-sm sm:text-base md:text-lg"><i class="fa-solid fa-briefcase mr-1"></i> Búsqueda de Ley Oficial</h4>
+                            <p class="text-xs sm:text-sm md:text-base text-slate-200 leading-relaxed">
+                                Un estudiante necesita descargar la Ley de Educación Técnico Profesional en PDF oficial. ¿Cuál es la estrategia idónea?
+                            </p>
+                        </div>
+
+                        <div class="space-y-3">
+                            <button onclick="checkCaseStudy(0)" class="w-full text-left p-4 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-xs sm:text-sm md:text-base text-slate-200 transition">
+                                A) Buscar "dame la ley de educacion" e ingresar al primer anuncio comercial.
+                            </button>
+                            <button onclick="checkCaseStudy(1)" class="w-full text-left p-4 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-xs sm:text-sm md:text-base text-slate-200 transition">
+                                B) Usar: <code>"ley de educacion tecnico profesional" site:.gob.ar filetype:pdf</code>
+                            </button>
+                            <button onclick="checkCaseStudy(2)" class="w-full text-left p-4 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-xs sm:text-sm md:text-base text-slate-200 transition">
+                                C) Leer un resumen en un foro anónimo sin verificar la fecha.
+                            </button>
+                        </div>
+
+                        <div id="caseFeedback" class="hidden p-4 rounded-xl text-xs sm:text-sm md:text-base font-bold leading-relaxed"></div>
+                    </div>
+                `,
+                teacherNotes: "Pida a un estudiante que argumente por qué la combinación de comillas, sitio estatal y PDF es la correcta."
+            },
+            {
+                id: 25,
+                title: "Taller Interactivo 2: Evaluación Formativa Final",
+                badge: "Evaluación Integradora",
+                type: "interactive-quiz",
+                content: `
+                    <div class="space-y-5">
+                        <div class="bg-slate-950 p-5 rounded-2xl border border-purple-500/30 space-y-2">
+                            <h4 class="font-bold text-purple-400 text-sm sm:text-base md:text-lg"><i class="fa-solid fa-circle-question mr-1"></i> Pregunta de Integración Teórica</h4>
+                            <p class="text-xs sm:text-sm md:text-base text-slate-200 leading-relaxed">
+                                Si realizas una consulta a un asistente de IA (ej. ChatGPT) y entrega una respuesta formal con números y fechas, ¿qué debes hacer?
+                            </p>
+                        </div>
+
+                        <div class="space-y-3">
+                            <button onclick="checkQuiz(0)" class="w-full text-left p-4 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-xs sm:text-sm md:text-base text-slate-200 transition">
+                                A) Copiar la respuesta directamente, dado que la IA no comete errores.
+                            </button>
+                            <button onclick="checkQuiz(1)" class="w-full text-left p-4 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-xs sm:text-sm md:text-base text-slate-200 transition">
+                                B) Utilizar la respuesta como borrador y verificar los datos clave en portales oficiales.
+                            </button>
+                            <button onclick="checkQuiz(2)" class="w-full text-left p-4 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-xs sm:text-sm md:text-base text-slate-200 transition">
+                                C) Descartar la herramienta por completo.
+                            </button>
+                        </div>
+
+                        <div id="quizFeedback" class="hidden p-4 rounded-xl text-xs sm:text-sm md:text-base font-bold leading-relaxed"></div>
+                    </div>
+                `,
+                teacherNotes: "Refuerce la idea de que la IA es un borrador útil siempre que el criterio humano dirija la verificación."
+            },
+            {
+                id: 26,
+                title: "Conclusión y Cierre Pedagógico TIC 2026",
+                badge: "Síntesis del Módulo",
+                image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop",
+                type: "cover",
+                content: `
+                    <div class="space-y-6 my-auto">
+                        <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-3">
+                            <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-graduation-cap text-sky-400"></i> Construyendo Pensamiento Autónomo
+                            </h3>
+                            <p class="text-sm sm:text-base md:text-xl text-slate-200 leading-relaxed">
+                                Las búsquedas eficientes y la IA nos brindan velocidad, pero la responsabilidad y el criterio analítico son capacidades exclusivas de ustedes como estudiantes adultos.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-950/90 p-5 rounded-xl border border-slate-800 text-xs sm:text-sm md:text-base text-slate-300 space-y-1.5">
+                            <p class="font-bold text-white">Referencias de Cátedra:</p>
+                            <p>• Apuntes del Prof. Nelson Garro • CENS N° 3-468 (Mendoza, Argentina).</p>
+                            <p>• Cuadernillos de Computación - Instituto Mario F. Alsina / Prof. Ricardo Leithner.</p>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Asigne la resolución del Trabajo Práctico de 15 Preguntas para la siguiente clase."
+            },
+            {
+                id: 27,
+                title: "Mensaje Final: Autonomía y Ciudadanía Digital",
+                badge: "Conclusión e Integración • EPJA 2026",
+                image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1200&auto=format&fit=crop",
+                type: "split",
+                content: `
+                    <div class="space-y-5">
+                        <div class="bg-gradient-to-r from-sky-950/80 to-slate-950 p-5 rounded-2xl border border-sky-500/30 space-y-3">
+                            <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-sky-400 flex items-center gap-2.5">
+                                <i class="fa-solid fa-shield-heart text-2xl text-sky-400"></i> Decálogo del Estudiante Adulto en la Era Digital
+                            </h3>
+                            <p class="text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                                En la modalidad de adultos (EPJA), su formación secundaria representa un paso de superación personal. Usar la tecnología con responsabilidad afirma su autonomía.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
+                                <div class="text-sky-400 font-bold text-xs sm:text-sm md:text-base flex items-center gap-2">
+                                    <i class="fa-solid fa-lock text-base"></i> Privacidad
+                                </div>
+                                <p class="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed">Protege claves y datos bancarios de enlaces o chats sospechosos.</p>
+                            </div>
+
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
+                                <div class="text-amber-400 font-bold text-xs sm:text-sm md:text-base flex items-center gap-2">
+                                    <i class="fa-solid fa-circle-question text-base"></i> Duda Crítica
+                                </div>
+                                <p class="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed">Duda del sensacionalismo y promesas de dinero fácil antes de compartir.</p>
+                            </div>
+
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
+                                <div class="text-emerald-400 font-bold text-xs sm:text-sm md:text-base flex items-center gap-2">
+                                    <i class="fa-solid fa-hands-holding-circle text-base"></i> Ejemplo
+                                </div>
+                                <p class="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed">Aplica lo aprendido para respaldar a tu familia y comunidad.</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-emerald-500/10 p-4 rounded-xl border border-emerald-500/30 flex items-center justify-between text-xs sm:text-sm md:text-base text-emerald-300">
+                            <span class="font-semibold"><i class="fa-solid fa-check-double mr-2"></i> "El conocimiento brinda libertad; la prudencia digital nos protege."</span>
+                            <span class="font-mono text-xs sm:text-sm text-emerald-400 hidden sm:inline">CENS N° 3-468 • Prof. Nelson Garro</span>
+                        </div>
+                    </div>
+                `,
+                teacherNotes: "Cierre recordando que la educación secundaria fortalece sus derechos como ciudadanos digitales."
+            }
+        ];
+
+        let currentSlideIndex = 0;
+        let activeTab = 'presentation';
+
+        function renderCurrentTab() {
+            const viewport = document.getElementById('appViewport');
+            
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('bg-sky-600', 'text-white', 'shadow-md');
+                btn.classList.add('bg-slate-900', 'border', 'border-slate-800', 'text-slate-300');
+            });
+
+            if (activeTab === 'presentation') {
+                document.getElementById('tabBtnPresentation').classList.add('bg-sky-600', 'text-white', 'shadow-md');
+                renderSlide();
+            } else if (activeTab === 'simulator') {
+                document.getElementById('tabBtnSimulator').classList.add('bg-sky-600', 'text-white', 'shadow-md');
+                renderStandaloneSimulator();
+            } else if (activeTab === 'validator') {
+                document.getElementById('tabBtnValidator').classList.add('bg-sky-600', 'text-white', 'shadow-md');
+                renderStandaloneValidator();
+            } else if (activeTab === 'apa') {
+                document.getElementById('tabBtnAPA').classList.add('bg-sky-600', 'text-white', 'shadow-md');
+                renderStandaloneAPA();
+            }
+        }
+
+        function switchTab(tabName) {
+            activeTab = tabName;
+            renderCurrentTab();
+        }
+
+        function renderSlide() {
+            const slide = slidesData[currentSlideIndex];
+            const viewport = document.getElementById('appViewport');
+
+            document.getElementById('slideCounterBadge').innerText = `${slide.id} / ${slidesData.length}`;
+            document.getElementById('teacherNotesContent').innerText = slide.teacherNotes || "No hay notas específicas para esta diapositiva.";
+
+            let headerHTML = `
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                    <span class="px-3 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/30 text-xs sm:text-sm md:text-base font-semibold rounded-full">${slide.badge}</span>
+                    <span class="text-xs sm:text-sm md:text-base text-slate-300 font-mono">Prof. Nelson Garro • ${slide.id} de ${slidesData.length}</span>
+                </div>
+            `;
+
+            let mainContentHTML = '';
+
+            if (slide.type === 'cover') {
+                mainContentHTML = slide.content;
+            } else {
+                const imgHeightClass = slide.imageHeight || "h-28 sm:h-36 md:h-44";
+                mainContentHTML = `
+                    <div class="flex-1 flex flex-col justify-between space-y-4">
+                        <div>
+                            ${headerHTML}
+                            <h2 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-white mb-3">${slide.title}</h2>
+                            ${slide.content}
+                        </div>
+                        ${slide.image ? `
+                            <div class="relative ${imgHeightClass} rounded-xl overflow-hidden border border-slate-800 shadow-md mt-2">
+                                <img src="${slide.image}" alt="${slide.title}" class="w-full h-full object-cover">
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            viewport.className = 'w-full flex-1 bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl p-5 sm:p-8 md:p-10 flex flex-col justify-between overflow-y-auto relative slide-fade-in';
+            viewport.innerHTML = mainContentHTML;
+
+            updateProgressBar();
+        }
+
+        function renderStandaloneSimulator() {
+            const viewport = document.getElementById('appViewport');
+            viewport.innerHTML = `
+                <div class="space-y-5 my-auto">
+                    <div class="border-b border-slate-800 pb-3">
+                        <span class="px-3 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/30 text-xs sm:text-sm font-semibold rounded-full">Herramienta Interactiva</span>
+                        <h2 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-white mt-2"><i class="fa-solid fa-terminal text-sky-400 mr-2"></i> Simulador de Sintaxis y Operadores Avanzados</h2>
+                    </div>
+
+                    <p class="text-sm sm:text-base md:text-lg text-slate-300 leading-relaxed">
+                        Selecciona o escribe combinaciones de sintaxis para observar cómo los algoritmos de búsqueda filtran los resultados:
+                    </p>
+
+                    <div class="bg-slate-950 p-5 sm:p-6 rounded-2xl border border-sky-500/30 space-y-4">
+                        <div class="flex flex-wrap gap-2.5">
+                            <button onclick="runSim('exact')" class="px-4 py-2 bg-slate-800 hover:bg-sky-600 active:scale-95 text-xs sm:text-sm md:text-base rounded-lg text-slate-200 font-mono transition">"Frase exacta"</button>
+                            <button onclick="runSim('exclude')" class="px-4 py-2 bg-slate-800 hover:bg-sky-600 active:scale-95 text-xs sm:text-sm md:text-base rounded-lg text-slate-200 font-mono transition">-Excluir término</button>
+                            <button onclick="runSim('site')" class="px-4 py-2 bg-slate-800 hover:bg-sky-600 active:scale-95 text-xs sm:text-sm md:text-base rounded-lg text-slate-200 font-mono transition">site:.gob.ar</button>
+                            <button onclick="runSim('file')" class="px-4 py-2 bg-slate-800 hover:bg-sky-600 active:scale-95 text-xs sm:text-sm md:text-base rounded-lg text-slate-200 font-mono transition">filetype:pdf</button>
+                        </div>
+
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-sm sm:text-base md:text-lg flex items-center gap-3">
+                            <i class="fa-solid fa-terminal text-sky-400 text-xl"></i>
+                            <span id="simQueryText" class="text-sky-300">"educacion secundaria de adultos" site:.edu.ar</span>
+                        </div>
+
+                        <div id="simResultBox" class="bg-slate-900/90 p-4 sm:p-5 rounded-xl border border-slate-800 text-sm sm:text-base md:text-lg text-slate-200 leading-relaxed">
+                            <p class="text-emerald-400 font-bold"><i class="fa-solid fa-check mr-2"></i> Filtra resultados strictly a páginas educativas oficiales de Argentina.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStandaloneValidator() {
+            const viewport = document.getElementById('appViewport');
+            viewport.innerHTML = `
+                <div class="space-y-5 my-auto">
+                    <div class="border-b border-slate-800 pb-3">
+                        <span class="px-3 py-1 bg-rose-500/10 text-rose-400 border border-rose-500/30 text-xs sm:text-sm font-semibold rounded-full">Seguridad Digital</span>
+                        <h2 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-white mt-2"><i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i> Validador de Enlaces y Detección de Phishing</h2>
+                    </div>
+
+                    <p class="text-sm sm:text-base md:text-lg text-slate-300 leading-relaxed">
+                        Haz clic en cada caso simulado para evaluar las señales de seguridad de la dirección web:
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div onclick="checkScam('fake')" class="bg-slate-950 p-5 rounded-xl border border-slate-800 cursor-pointer hover:border-rose-500 transition space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs sm:text-sm font-bold text-rose-400">Caso 1: Enlace Sospechoso</span>
+                                <i class="fa-solid fa-triangle-exclamation text-rose-400 text-xl"></i>
+                            </div>
+                            <p class="text-xs sm:text-sm md:text-base font-mono bg-slate-900 p-3 rounded text-slate-300">"www.anses-cobro-bono-urgente.com/verificar"</p>
+                            <span class="text-xs sm:text-sm text-sky-400 font-semibold block">Comprobar riesgo →</span>
+                        </div>
+
+                        <div onclick="checkScam('official')" class="bg-slate-950 p-5 rounded-xl border border-slate-800 cursor-pointer hover:border-emerald-500 transition space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs sm:text-sm font-bold text-emerald-400">Caso 2: Portal Auténtico</span>
+                                <i class="fa-solid fa-circle-check text-emerald-400 text-xl"></i>
+                            </div>
+                            <p class="text-xs sm:text-sm md:text-base font-mono bg-slate-900 p-3 rounded text-slate-300">"www.anses.gob.ar/prestaciones"</p>
+                            <span class="text-xs sm:text-sm text-sky-400 font-semibold block">Comprobar riesgo →</span>
+                        </div>
+                    </div>
+
+                    <div id="scamFeedback" class="hidden p-4 rounded-xl text-xs sm:text-sm md:text-base font-semibold leading-relaxed"></div>
+                </div>
+            `;
+        }
+
+        function renderStandaloneAPA() {
+            const viewport = document.getElementById('appViewport');
+            viewport.innerHTML = `
+                <div class="space-y-5 my-auto">
+                    <div class="border-b border-slate-800 pb-3">
+                        <span class="px-3 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/30 text-xs sm:text-sm font-semibold rounded-full">Normalización Académica</span>
+                        <h2 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-white mt-2"><i class="fa-solid fa-quote-right text-purple-400 mr-2"></i> Generador de Citas APA 7.ª Edición</h2>
+                    </div>
+
+                    <p class="text-sm sm:text-base md:text-lg text-slate-300 leading-relaxed">
+                        Completa los datos de la fuente utilizada en tu investigación escolar del CENS N° 3-468:
+                    </p>
+
+                    <div class="bg-slate-950 p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <input id="apaAuthor" type="text" placeholder="Autor (Ej: Garro, N.)" class="bg-slate-900 border border-slate-700 text-xs sm:text-sm md:text-base text-white p-3 rounded-xl focus:outline-none focus:border-sky-500">
+                            <input id="apaYear" type="text" placeholder="Año (Ej: 2026)" class="bg-slate-900 border border-slate-700 text-xs sm:text-sm md:text-base text-white p-3 rounded-xl focus:outline-none focus:border-sky-500">
+                            <input id="apaTitle" type="text" placeholder="Título de la publicación" class="bg-slate-900 border border-slate-700 text-xs sm:text-sm md:text-base text-white p-3 rounded-xl focus:outline-none focus:border-sky-500">
+                        </div>
+                        <button onclick="generateAPA()" class="w-full py-3 bg-sky-600 hover:bg-sky-500 text-xs sm:text-sm md:text-base text-white font-bold rounded-xl transition">Construir Formato APA</button>
+
+                        <div id="apaOutput" class="bg-slate-900 p-4 rounded-xl border border-slate-800 text-xs sm:text-sm md:text-base font-mono text-emerald-400 break-all">
+                            Completa los campos arriba para visualizar la cita bibliográfica.
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateProgressBar() {
+            const container = document.getElementById('progressBarContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            slidesData.forEach((s, idx) => {
+                const dot = document.createElement('div');
+                dot.className = `h-2 flex-1 rounded-full transition-all duration-200 cursor-pointer ${idx === currentSlideIndex ? 'bg-sky-400 shadow-sm shadow-sky-400/50' : 'bg-slate-800 hover:bg-slate-700'}`;
+                dot.onclick = () => {
+                    activeTab = 'presentation';
+                    currentSlideIndex = idx;
+                    renderCurrentTab();
+                };
+                dot.title = `Diapositiva ${idx + 1}: ${s.title}`;
+                container.appendChild(dot);
+            });
+        }
+
+        function nextSlide() {
+            activeTab = 'presentation';
+            if (currentSlideIndex < slidesData.length - 1) {
+                currentSlideIndex++;
+                renderCurrentTab();
+            }
+        }
+
+        function prevSlide() {
+            activeTab = 'presentation';
+            if (currentSlideIndex > 0) {
+                currentSlideIndex--;
+                renderCurrentTab();
+            }
+        }
+
+        function toggleTeacherNotes() {
+            document.getElementById('teacherNotesDrawer').classList.toggle('hidden');
+        }
+
+        function toggleSlideMenu() {
+            const modal = document.getElementById('slideMenuModal');
+            const container = document.getElementById('slideGridContainer');
+
+            if (modal.classList.contains('hidden')) {
+                container.innerHTML = '';
+                slidesData.forEach((slide, idx) => {
+                    const card = document.createElement('div');
+                    card.className = `p-3 rounded-xl border text-left cursor-pointer transition ${idx === currentSlideIndex ? 'bg-sky-950 border-sky-400 text-white shadow-md' : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800'}`;
+                    card.onclick = () => {
+                        currentSlideIndex = idx;
+                        activeTab = 'presentation';
+                        renderCurrentTab();
+                        toggleSlideMenu();
+                    };
+                    card.innerHTML = `
+                        <div class="text-xs text-sky-400 font-bold font-mono">SLIDE ${slide.id}</div>
+                        <div class="text-xs sm:text-sm font-semibold line-clamp-2 mt-0.5 leading-tight">${slide.title}</div>
+                    `;
+                    container.appendChild(card);
+                });
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function runSim(type) {
+            const querySpan = document.getElementById('simQueryText');
+            const resultBox = document.getElementById('simResultBox');
+            if (!querySpan || !resultBox) return;
+
+            if (type === 'exact') {
+                querySpan.innerText = '"educacion secundaria de adultos"';
+                resultBox.innerHTML = '<p class="text-emerald-400 font-bold"><i class="fa-solid fa-check mr-2"></i> Busca la frase exacta completa en ese orden de palabras riguroso.</p>';
+            } else if (type === 'exclude') {
+                querySpan.innerText = 'cursos informatica -pago -arancelado';
+                resultBox.innerHTML = '<p class="text-emerald-400 font-bold"><i class="fa-solid fa-check mr-2"></i> Elimina opciones comerciales para acotar a capacitaciones gratuitas.</p>';
+            } else if (type === 'site') {
+                querySpan.innerText = 'tramites anses site:.gob.ar';
+                resultBox.innerHTML = '<p class="text-emerald-400 font-bold"><i class="fa-solid fa-check mr-2"></i> Limita los resultados exclusivamente a dominios oficiales del Estado Argentino.</p>';
+            } else if (type === 'file') {
+                querySpan.innerText = 'manual electricidad industrial filetype:pdf';
+                resultBox.innerHTML = '<p class="text-emerald-400 font-bold"><i class="fa-solid fa-check mr-2"></i> Devuelve únicamente archivos descargables en formato PDF de alta calidad.</p>';
+            }
+        }
+
+        function checkScam(type) {
+            const feedback = document.getElementById('scamFeedback');
+            if (!feedback) return;
+            feedback.classList.remove('hidden');
+
+            if (type === 'fake') {
+                feedback.className = "p-4 rounded-xl text-xs sm:text-sm md:text-base font-bold bg-rose-500/20 border border-rose-500/40 text-rose-300";
+                feedback.innerHTML = "⚠️ ¡RIESGO DE PHISHING! Los enlaces con extensiones '.com' o nombres modificados suplantan identidades para robar credenciales bancarias.";
+            } else if (type === 'official') {
+                feedback.className = "p-4 rounded-xl text-xs sm:text-sm md:text-base font-bold bg-emerald-500/20 border border-emerald-500/40 text-emerald-300";
+                feedback.innerHTML = "✓ SITIO AUTÉNTICO: El dominio '.gob.ar' es otorgado legal y exclusivamente a organismos públicos del Estado Argentino.";
+            }
+        }
+
+        function generateAPA() {
+            const author = document.getElementById('apaAuthor')?.value.trim() || 'Garro, N.';
+            const year = document.getElementById('apaYear')?.value.trim() || '2026';
+            const title = document.getElementById('apaTitle')?.value.trim() || 'Búsquedas en Internet e Inteligencia Artificial';
+            const output = document.getElementById('apaOutput');
+
+            if (output) {
+                output.innerHTML = `${author} (${year}). <em>${title}</em>. Material didáctico CENS N° 3-468. Mendoza, Argentina.`;
+            }
+        }
+
+        function checkCaseStudy(option) {
+            const feedback = document.getElementById('caseFeedback');
+            if (!feedback) return;
+            feedback.classList.remove('hidden');
+
+            if (option === 1) {
+                feedback.className = "p-4 rounded-xl text-xs sm:text-sm md:text-base font-bold bg-emerald-500/20 border border-emerald-500/40 text-emerald-300";
+                feedback.innerHTML = "¡Excelente! La combinación de comillas fija el título exacto, <code>site:.gob.ar</code> garantiza la validez oficial y <code>filetype:pdf</code> descarga la ley completa.";
+            } else {
+                feedback.className = "p-4 rounded-xl text-xs sm:text-sm md:text-base font-bold bg-amber-500/20 border border-amber-500/40 text-amber-300";
+                feedback.innerHTML = "Sugerencia: Utiliza operadores combinados para evitar ingresar a portales publicitarios o sin respaldo.";
+            }
+        }
+
+        function checkQuiz(option) {
+            const feedback = document.getElementById('quizFeedback');
+            if (!feedback) return;
+            feedback.classList.remove('hidden');
+
+            if (option === 1) {
+                feedback.className = "p-4 rounded-xl text-xs sm:text-sm md:text-base font-bold bg-emerald-500/20 border border-emerald-500/40 text-emerald-300";
+                feedback.innerHTML = "¡Correcto! La IA es un borrador muy eficiente, pero los datos clave deben ser siempre verificados en fuentes directas.";
+            } else {
+                feedback.className = "p-4 rounded-xl text-xs sm:text-sm md:text-base font-bold bg-rose-500/20 border border-rose-500/40 text-rose-300";
+                feedback.innerHTML = "Atención: La IA suele alucinar datos con redacción segura. No debemos copiar cifras o leyes sin previa verificación.";
+            }
+        }
+
+        function openTPModal() {
+            const list = document.getElementById('tpQuestionsList');
+            const questions = [
+                "¿Cuál es la diferencia fundamental entre la escasez de información del pasado (libros impresos) y la 'infoxicación' actual?",
+                "Explica qué son las 'arañas web' (bots) y cuál es su función en el rastreo e indización de páginas.",
+                "¿Por qué los buscadores como Google no son totalmente 'gratuitos'? Explica la diferencia entre resultados orgánicos y patrocinados.",
+                "¿Qué es la 'Burbuja de Filtro' y de qué manera puede condicionar o sesgar las noticias que ves a diario?",
+                "Compara un buscador tradicional (Google) con un asistente de IA (ChatGPT/Gemini). ¿Cuándo conviene usar cada uno?",
+                "¿Qué significa que una Inteligencia Artificial 'alucine'? Menciona un riesgo de no verificar sus respuestas.",
+                "Explica la utilidad del operador de frase exacta entre comillas \" \" y da un ejemplo práctico.",
+                "¿Qué comandos o palabras clave combinarías para descargar un formulario oficial gubernamental en PDF (ej. ANSES/AFIP)?",
+                "¿Cómo facilitan las búsquedas multimodales (por voz o cámara con Google Lens) el trabajo cotidiano de un adulto?",
+                "Explica la 'Regla de las 3 Fuentes' para validar si una información de Internet es fidedigna.",
+                "¿Qué es el Phishing y qué pistas te permiten detectar un mensaje engañoso o estafa virtual?",
+                "¿Por qué Wikipedia es un excelente punto de partida pero requiere revisar siempre su sección final de referencias?",
+                "¿Qué importancia tienen las Normas APA y dar crédito a los autores en tus trabajos escolares del CENS?",
+                "[Reflexión Personal]: En tu vida cotidiana o laboral, ¿cuál fue el trámite o búsqueda digital más difícil que tuviste que resolver y cómo lo lograste?",
+                "[Reflexión Familiar/Comunitaria]: ¿Cómo puedes aplicar estos conocimientos para proteger tus datos y orientar a tus hijos o familiares mayores?"
+            ];
+
+            list.innerHTML = `
+                <div class="border-b border-slate-800 pb-3 space-y-1.5">
+                    <div class="flex flex-wrap justify-between text-xs sm:text-sm font-semibold text-sky-400">
+                        <span>INSTITUCIÓN: CENS N° 3-468 (Mendoza)</span>
+                        <span>MATERIA: Tecnologías de la Información y la Comunicación</span>
+                    </div>
+                    <div class="flex flex-wrap justify-between text-xs sm:text-sm font-semibold text-slate-300">
+                        <span>CURSO: 3° Año (EPJA)</span>
+                        <span>PROFESOR: Nelson Garro</span>
+                    </div>
+                </div>
+
+                <div class="bg-amber-500/10 border border-amber-500/30 p-3.5 rounded-xl flex items-center justify-between text-xs sm:text-sm text-amber-300">
+                    <span><i class="fa-solid fa-cloud-arrow-up mr-2 text-amber-400"></i> ¿Resolviste tu TP? Súbelo a la carpeta oficial de Drive:</span>
+                    <a href="https://drive.google.com/drive/folders/1tC7fQl-_jZeihX78jNkyPsulpHNM-1G5?usp=sharing" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg transition whitespace-nowrap ml-2">
+                        Subir a Drive <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                    </a>
+                </div>
+
+                <ol class="list-decimal list-inside space-y-3.5">
+                    ${questions.map((q, i) => `
+                        <li class="bg-slate-900 p-4 rounded-xl border ${i >= 13 ? 'border-sky-500/40' : 'border-slate-800'}">
+                            <strong>${q}</strong>
+                        </li>
+                    `).join('')}
+                </ol>
+            `;
+
+            document.getElementById('tpModal').classList.remove('hidden');
+        }
+
+        function closeTPModal() {
+            document.getElementById('tpModal').classList.add('hidden');
+        }
+
+        function printTP() {
+            const printContent = document.getElementById('printableWorksheet').innerHTML;
+            let iframe = document.getElementById('print_frame');
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.id = 'print_frame';
+                iframe.style.position = 'fixed';
+                iframe.style.right = '0';
+                iframe.style.bottom = '0';
+                iframe.style.width = '0';
+                iframe.style.height = '0';
+                iframe.style.border = '0';
+                document.body.appendChild(iframe);
+            }
+
+            const doc = iframe.contentWindow.document;
+            doc.open();
+            doc.write(`
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Trabajo Práctico Evaluativo - CENS N° 3-468</title>
+                    <style>
+                        @page { size: A4; margin: 1.5cm; }
+                        body { font-family: Arial, Helvetica, sans-serif; padding: 15px; color: #000; line-height: 1.6; max-width: 800px; margin: 0 auto; background: #fff; font-size: 11pt; }
+                        .answer-line-print { border-bottom: 1px dashed #64748b; margin-top: 12px; height: 28px; }
+                    </style>
+                </head>
+                <body>
+                    ${printContent}
+                </body>
+                </html>
+            `);
+            doc.close();
+
+            setTimeout(() => {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            }, 300);
+        }
+
+        function copyTPText() {
+            const rawText = `
+CENS N° 3-468 • Educación de Jóvenes y Adultos
+Materia: Tecnologías de la Información y la Comunicación (TIC 3° Año)
+Profesor: Nelson Garro • Ciclo Lectivo 2026
+
+TRABAJO PRÁCTICO INTEGRADOR: Búsquedas Digitales, IA y Ciudadanía Crítica
+
+Link para subir la producción resuelta: https://drive.google.com/drive/folders/1tC7fQl-_jZeihX78jNkyPsulpHNM-1G5?usp=sharing
+
+1. ¿Cuál es la diferencia fundamental entre la escasez de información del pasado (libros impresos) y la "infoxicación" actual?
+2. Explica qué son las "arañas web" (bots) y cuál es su función en el rastreo e indización de páginas.
+3. ¿Por qué los buscadores como Google no son totalmente "gratuitos"? Explica la diferencia entre resultados orgánicos y patrocinados.
+4. ¿Qué es la "Burbuja de Filtro" y de qué manera puede condicionar o sesgar las noticias que ves a diario?
+5. Compara un buscador tradicional (Google) con un asistente de IA (ChatGPT/Gemini). ¿Cuándo conviene usar cada uno?
+6. ¿Qué significa que una Inteligencia Artificial "alucine"? Menciona un riesgo de no verificar sus respuestas.
+7. Explica la utilidad del operador de frase exacta entre comillas " " y da un ejemplo práctico.
+8. ¿Qué comandos o palabras clave combinarías para descargar un formulario oficial gubernamental en PDF (ej. ANSES/AFIP)?
+9. ¿Cómo facilitan las búsquedas multimodales (por voz o cámara con Google Lens) el trabajo cotidiano de un adulto?
+10. Explica la "Regla de las 3 Fuentes" para validar si una información de Internet es fidedigna.
+11. ¿Qué es el Phishing y qué pistas te permiten detectar un mensaje engañoso o estafa virtual?
+12. ¿Por qué Wikipedia es un excelente punto de partida pero requiere revisar siempre su sección final de referencias?
+13. ¿Qué importancia tienen las Normas APA y dar crédito a los autores en tus trabajos escolares del CENS?
+14. [Reflexión Personal]: En tu vida cotidiana o laboral, ¿cuál fue el trámite o búsqueda digital más difícil que tuviste que resolver y cómo lo lograste?
+15. [Reflexión Familiar/Comunitaria]: ¿Cómo puedes aplicar estos conocimientos para proteger tus datos y orientar a tus hijos o familiares mayores?
+            `.trim();
+
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = rawText;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+
+            showToast("✓ ¡Las 15 consignas han sido copiadas al portapapeles!");
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastNotification');
+            if (!toast) return;
+            toast.innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            else if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        window.onload = function() {
+            renderCurrentTab();
+        };
+    </script>
+</body>
+</html>
