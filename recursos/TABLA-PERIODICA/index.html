@@ -1,1 +1,1159 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla Periódica Interactiva - Química Secundaria Mendoza</title>
+    
+    <!-- Tailwind CSS para diseño moderno y adaptativo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'mendoza-wine': '#6b1128',
+                        'mendoza-gold': '#d4af37',
+                        'alkali': '#ef4444',
+                        'alkaline': '#f97316',
+                        'transition': '#f59e0b',
+                        'post-transition': '#10b981',
+                        'metalloid': '#06b6d4',
+                        'nonmetal': '#3b82f6',
+                        'halogen': '#6366f1',
+                        'noble': '#8b5cf6',
+                        'lanthanide': '#ec4899',
+                        'actinide': '#d946ef',
+                        'unknown': '#64748b'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
 
+    <!-- FontAwesome para iconografía -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Three.js y OrbitControls para la simulación 3D del Modelo de Bohr -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* Personalización de scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Efectos de la celda del elemento */
+        .element-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+        .element-card:hover {
+            transform: scale(1.12) z-index(30);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 255, 255, 0.2);
+            z-index: 20;
+        }
+        .element-card.dimmed {
+            opacity: 0.25;
+            filter: grayscale(80%);
+            transform: scale(0.95);
+        }
+        .element-card.highlighted {
+            animation: pulse-ring 1.5s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(212, 175, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+
+        /* Glassmorphic overlay */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Grid de la tabla periódica de 18 columnas */
+        .ptable-grid {
+            display: grid;
+            grid-template-columns: repeat(18, minmax(0, 1fr));
+            gap: 4px;
+        }
+
+        /* Colores por naturaleza del elemento */
+        .bg-alkali { background-color: #ef4444; border-color: #f87171; }
+        .bg-alkaline { background-color: #f97316; border-color: #fb923c; }
+        .bg-transition { background-color: #d97706; border-color: #f59e0b; }
+        .bg-post-transition { background-color: #059669; border-color: #10b981; }
+        .bg-metalloid { background-color: #0891b2; border-color: #06b6d4; }
+        .bg-nonmetal { background-color: #2563eb; border-color: #3b82f6; }
+        .bg-halogen { background-color: #4f46e5; border-color: #6366f1; }
+        .bg-noble { background-color: #7c3aed; border-color: #8b5cf6; }
+        .bg-lanthanide { background-color: #db2777; border-color: #ec4899; }
+        .bg-actinide { background-color: #c026d3; border-color: #d946ef; }
+        .bg-unknown { background-color: #475569; border-color: #64748b; }
+
+        .text-alkali { color: #fca5a5; }
+        .text-alkaline { color: #fdba74; }
+        .text-transition { color: #fcd34d; }
+        .text-post-transition { color: #6ee7b7; }
+        .text-metalloid { color: #67e8f9; }
+        .text-nonmetal { color: #93c5fd; }
+        .text-halogen { color: #a5b4fc; }
+        .text-noble { color: #c4b5fd; }
+        .text-lanthanide { color: #fbcfe8; }
+        .text-actinide { color: #f5d0fe; }
+        .text-unknown { color: #cbd5e1; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between bg-slate-950 text-slate-100">
+
+    <!-- ENCABEZADO INSTITUCIONAL Y EDUCATIVO -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- Identificación Escolar Mendoza -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-800 via-red-600 to-amber-500 flex items-center justify-center text-white font-black text-xl shadow-md border border-amber-400/30">
+                    <i class="fa-solid fa-atom"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight text-white flex items-center gap-2">
+                        Tabla Periódica Interactiva
+                        <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full font-medium">Secundaria Orientada</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Dirección de Educación Secundaria • Provincia de Mendoza</p>
+                </div>
+            </div>
+
+            <!-- Buscador y Accesos Rápidos -->
+            <div class="flex items-center gap-3 flex-grow max-w-md">
+                <div class="relative w-full">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar por nombre, símbolo o N° atómico (ej. C, Oro, 29)..." 
+                        class="w-full pl-9 pr-8 py-2 bg-slate-800/90 text-sm rounded-lg border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition">
+                    <button id="clearSearch" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                
+                <button id="btnQuiz" class="px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-semibold text-xs rounded-lg transition flex items-center gap-1.5 shadow-lg shadow-amber-500/20 whitespace-nowrap">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Quiz Química</span>
+                </button>
+
+                <a href="https://drive.google.com/drive/folders/1L9seiE9uOQHJeH7D1n5QsQy-bdzttza-?usp=sharing" target="_blank" rel="noopener noreferrer"
+                   class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-lg transition flex items-center gap-1.5 shadow-lg shadow-emerald-500/20 whitespace-nowrap"
+                   title="Recursos descargables para Profes">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span>Recursos para Profes</span>
+                </a>
+            </div>
+        </div>
+    <a href="../../index.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-800 text-white font-semibold transition" title="Regresar al Portal"><i class="fas fa-home"></i><span>Volver al Portal</span></a></header>
+
+    <!-- BARRA DE LEYENDA Y FILTROS POR CLASIFICACIÓN NATURALEZA -->
+    <section class="max-w-7xl mx-auto px-4 pt-4 pb-2 w-full">
+        <div class="bg-slate-900/80 rounded-xl p-3 border border-slate-800/80 shadow-lg">
+            <div class="flex items-center justify-between mb-2">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                    <i class="fa-solid fa-filter text-amber-400"></i> Clasificación por Naturaleza del Elemento:
+                </h2>
+                <button id="resetFiltersBtn" class="text-xs text-slate-400 hover:text-amber-300 transition flex items-center gap-1">
+                    <i class="fa-solid fa-rotate-left"></i> Restablecer Filtros
+                </button>
+            </div>
+
+            <!-- Botones de Clasificación Categoría -->
+            <div class="flex flex-wrap gap-1.5 text-xs">
+                <button data-category="alkali" class="cat-filter-btn px-2.5 py-1 rounded-md bg-alkali/20 border border-alkali/50 text-red-300 hover:bg-alkali/40 transition">Metales Alcalinos</button>
+                <button data-category="alkaline" class="cat-filter-btn px-2.5 py-1 rounded-md bg-alkaline/20 border border-alkaline/50 text-orange-300 hover:bg-alkaline/40 transition">Alcalinotérreos</button>
+                <button data-category="transition" class="cat-filter-btn px-2.5 py-1 rounded-md bg-transition/20 border border-transition/50 text-amber-300 hover:bg-transition/40 transition">Metales de Transición</button>
+                <button data-category="post-transition" class="cat-filter-btn px-2.5 py-1 rounded-md bg-post-transition/20 border border-post-transition/50 text-emerald-300 hover:bg-post-transition/40 transition">Otros Metales</button>
+                <button data-category="metalloid" class="cat-filter-btn px-2.5 py-1 rounded-md bg-metalloid/20 border border-metalloid/50 text-cyan-300 hover:bg-metalloid/40 transition">Metaloides</button>
+                <button data-category="nonmetal" class="cat-filter-btn px-2.5 py-1 rounded-md bg-nonmetal/20 border border-nonmetal/50 text-blue-300 hover:bg-nonmetal/40 transition">No Metales Reactivos</button>
+                <button data-category="halogen" class="cat-filter-btn px-2.5 py-1 rounded-md bg-halogen/20 border border-halogen/50 text-indigo-300 hover:bg-halogen/40 transition">Halógenos</button>
+                <button data-category="noble" class="cat-filter-btn px-2.5 py-1 rounded-md bg-noble/20 border border-noble/50 text-purple-300 hover:bg-noble/40 transition">Gases Nobles</button>
+                <button data-category="lanthanide" class="cat-filter-btn px-2.5 py-1 rounded-md bg-lanthanide/20 border border-lanthanide/50 text-pink-300 hover:bg-lanthanide/40 transition">Lantánidos</button>
+                <button data-category="actinide" class="cat-filter-btn px-2.5 py-1 rounded-md bg-actinide/20 border border-actinide/50 text-fuchsia-300 hover:bg-actinide/40 transition">Actínidos</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTENEDOR PRINCIPAL DE LA TABLA PERIÓDICA -->
+    <main class="max-w-7xl mx-auto px-4 py-2 w-full flex-grow flex flex-col justify-center overflow-x-auto">
+        
+        <div class="min-w-[980px] my-auto">
+
+            <!-- Grid Principal (118 elementos organizados por periodos y grupos) -->
+            <div id="periodicGrid" class="ptable-grid">
+                <!-- Se poblará dinámicamente mediante JavaScript -->
+            </div>
+
+            <!-- Separador Bloques Lantánidos y Actínidos -->
+            <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span class="font-semibold text-slate-300 flex items-center gap-1">
+                    <i class="fa-solid fa-layer-group text-amber-400"></i> Elementos de Transición Interna (Bloque f)
+                </span>
+                <span class="text-[11px] italic">Ubicados internamente en los períodos 6 y 7</span>
+            </div>
+
+            <!-- Sub-grid Lantánidos y Actínidos -->
+            <div id="lanthanidesActinidesGrid" class="grid grid-cols-18 gap-1">
+                <!-- Se poblará dinámicamente -->
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL DE DETALLE DEL ELEMENTO Y SIMULADOR 3D BOHR -->
+    <div id="elementModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-panel w-full max-w-4xl rounded-2xl border border-slate-700/80 shadow-2xl overflow-hidden relative my-auto animate-fade-in">
+            
+            <!-- Botón de Cerrar -->
+            <button id="closeModalBtn" class="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-700 transition flex items-center justify-center border border-slate-600">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[500px]">
+                
+                <!-- Columna Izquierda: Visor 3D del Modelo de Bohr -->
+                <div class="lg:col-span-6 bg-slate-950/60 p-5 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-800 relative">
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs uppercase tracking-wider text-amber-400 font-semibold flex items-center gap-1.5">
+                                <i class="fa-solid flex-spin fa-atom text-sm"></i> Modelo Atómico de Bohr (3D)
+                            </span>
+                            <span id="modalElementCategoryBadge" class="text-[11px] px-2 py-0.5 rounded-full font-medium border">
+                                Categoría
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-400">Visualización interactiva: Núcleo ($p^+$ y $n^0$) y electrones ($e^-$) orbitando en niveles energéticos ($K, L, M, N...$).</p>
+                    </div>
+
+                    <!-- Canvas Three.js -->
+                    <div class="relative w-full h-[280px] my-2 bg-slate-900/50 rounded-xl overflow-hidden border border-slate-800/80 flex items-center justify-center">
+                        <div id="bohr3dCanvasContainer" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+                        
+                        <!-- Indicador de Control de Cámara -->
+                        <div class="absolute bottom-2 left-2 right-2 text-[10px] text-slate-400 bg-slate-950/70 backdrop-blur px-2 py-1 rounded flex justify-between items-center pointer-events-none">
+                            <span><i class="fa-solid fa-hand-pointer mr-1"></i> Arrastra para rotar 3D</span>
+                            <span><i class="fa-solid fa-magnifying-glass-plus mr-1"></i> Rueda para zoom</span>
+                        </div>
+                    </div>
+
+                    <!-- Leyenda del Modelo 3D -->
+                    <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                        <div class="p-1.5 rounded-lg bg-red-950/40 border border-red-800/40 text-red-300">
+                            <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500 mr-1"></span> Protones (<span id="modalProtonsCount">0</span>)
+                        </div>
+                        <div class="p-1.5 rounded-lg bg-blue-950/40 border border-blue-800/40 text-blue-300">
+                            <span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-500 mr-1"></span> Neutrones (<span id="modalNeutronsCount">0</span>)
+                        </div>
+                        <div class="p-1.5 rounded-lg bg-amber-950/40 border border-amber-800/40 text-amber-300">
+                            <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 mr-1"></span> Electrones (<span id="modalElectronsCount">0</span>)
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Columna Derecha: Información Química Detallada -->
+                <div class="lg:col-span-6 p-6 flex flex-col justify-between space-y-4">
+                    
+                    <!-- Ficha Encabezado -->
+                    <div class="flex items-start justify-between border-b border-slate-800 pb-4">
+                        <div>
+                            <span class="text-xs text-slate-400 font-mono">Número Atómico (Z): <strong id="modalZ" class="text-amber-400 text-sm">0</strong></span>
+                            <h2 id="modalElementName" class="text-2xl font-black text-white tracking-tight">Nombre del Elemento</h2>
+                            <p id="modalElementEnglish" class="text-xs text-slate-400 italic">Nombre Latín / Inglés</p>
+                        </div>
+                        
+                        <div id="modalSymbolBox" class="w-16 h-16 rounded-xl flex flex-col items-center justify-center font-black border-2 shadow-lg">
+                            <span id="modalSymbol" class="text-2xl leading-none">H</span>
+                            <span id="modalMassHeader" class="text-[9px] mt-1 opacity-80">1.008</span>
+                        </div>
+                    </div>
+
+                    <!-- Datos Cuantitativos Subatómicos -->
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                            <span class="text-slate-400 block text-[11px]">Masa Atómica (A)</span>
+                            <span id="modalAtomicMass" class="text-base font-bold text-slate-200">0.00 u</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                            <span class="text-slate-400 block text-[11px]">Estado Estándar (25°C)</span>
+                            <span id="modalState" class="text-base font-bold text-amber-300">Sólido</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                            <span class="text-slate-400 block text-[11px]">Periodo / Grupo</span>
+                            <span id="modalPeriodGroup" class="text-base font-bold text-slate-200">Periodo 1 / Grupo 1</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                            <span class="text-slate-400 block text-[11px]">Configuración Electrónica</span>
+                            <span id="modalBohrShells" class="text-xs font-mono font-bold text-emerald-400">2, 8, 1</span>
+                        </div>
+                    </div>
+
+                    <!-- Descripción Educativa y Composición -->
+                    <div class="space-y-2">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-book-bookmark text-amber-400"></i> Composición y Propiedades
+                        </h3>
+                        <p id="modalDescription" class="text-xs text-slate-300 leading-relaxed bg-slate-900/40 p-3 rounded-xl border border-slate-800/60 max-h-36 overflow-y-auto">
+                            Descripción detallada del elemento...
+                        </p>
+                    </div>
+
+                    <!-- Relación con la Orientación Secundaria Mendoza -->
+                    <div class="p-3 rounded-xl bg-gradient-to-r from-amber-950/30 to-red-950/30 border border-amber-500/20 text-xs">
+                        <span class="font-bold text-amber-300 block mb-0.5 flex items-center gap-1">
+                            <i class="fa-solid fa-lightbulb"></i> ¿Sabías que? (Aplicación Cotidiana)
+                        </span>
+                        <p id="modalCuriosity" class="text-slate-300 text-[11px] leading-normal">
+                            Información sobre el elemento en la naturaleza, industria y vida diaria.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL DE QUIZ EDUCATIVO -->
+    <div id="quizModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg rounded-2xl border border-slate-700 shadow-2xl p-6 relative">
+            <button id="closeQuizBtn" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="flex items-center gap-2 mb-4">
+                <div class="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-circle-question"></i>
+                </div>
+                <div>
+                    <h2 class="font-bold text-lg text-white">Desafío de Química Secundaria</h2>
+                    <p class="text-xs text-slate-400">Pone a prueba tus conocimientos sobre la Tabla Periódica</p>
+                </div>
+            </div>
+
+            <!-- Contenido del Quiz -->
+            <div id="quizContainer" class="space-y-4">
+                <div class="flex justify-between items-center text-xs text-slate-400 border-b border-slate-800 pb-2">
+                    <span id="quizScore">Puntaje: 0</span>
+                    <span id="quizQuestionCount">Pregunta 1 de 5</span>
+                </div>
+
+                <p id="quizQuestionText" class="text-sm font-semibold text-slate-200">
+                    Cargando pregunta...
+                </p>
+
+                <div id="quizOptions" class="space-y-2">
+                    <!-- Opciones de respuesta -->
+                </div>
+
+                <div id="quizFeedback" class="hidden text-xs p-2.5 rounded-lg border"></div>
+
+                <button id="nextQuizBtn" class="hidden w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg transition">
+                    Siguiente Pregunta <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECURSOS PARA DOCENTES -->
+    <section class="max-w-7xl mx-auto px-4 pb-5 w-full">
+        <div class="bg-gradient-to-r from-emerald-950/70 to-slate-900 rounded-xl p-4 border border-emerald-700/30 shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-emerald-600/20 text-emerald-300 flex items-center justify-center">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-white">Recursos para Profes</h2>
+                    <p class="text-xs text-slate-400">Materiales complementarios y archivos descargables para trabajar con esta Tabla Periódica Interactiva.</p>
+                </div>
+            </div>
+            <a href="https://drive.google.com/drive/folders/1L9seiE9uOQHJeH7D1n5QsQy-bdzttza-?usp=sharing" target="_blank" rel="noopener noreferrer"
+               class="shrink-0 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg transition flex items-center gap-2">
+                <i class="fa-brands fa-google-drive"></i>
+                Abrir carpeta de Drive
+            </a>
+        </div>
+    </section>
+
+    <!-- PIE DE PÁGINA EDUCATIVO -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-3 px-4 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+            <p>Recurso Didáctico de Química • Escuelas Secundarias Orientadas • Provincia de Mendoza</p>
+            <p class="text-[11px]">Modelos atómicos según la física cuántica estándar y Bohr-Sommerfeld</p>
+        </div>
+    </footer>
+
+    <script>
+        /*
+         * BASE DE DATOS COMPLETA DE LOS 118 ELEMENTOS QUÍMICOS
+         * Con datos requeridos para Secundarias Orientadas de Mendoza
+         */
+        const elementsData = [
+            { z: 1, sym: "H", name: "Hidrógeno", mass: 1.008, cat: "nonmetal", group: 1, period: 1, state: "Gas", shells: [1], desc: "Es el elemento químico más ligero y abundante del universo. Compuesto por 1 protón y 1 electrón.", curiosity: "Forma el agua (H₂O) junto al oxígeno, vital para los oasis de riego mendocinos." },
+            { z: 2, sym: "He", name: "Helio", mass: 4.0026, cat: "noble", group: 18, period: 1, state: "Gas", shells: [2], desc: "Gas noble inerte, incoloro e inodoro. Es el segundo elemento más abundante en el cosmos.", curiosity: "Se utiliza en globos aerostáticos, criogenia y en buceo de gran profundidad." },
+            { z: 3, sym: "Li", name: "Litio", mass: 6.94, cat: "alkali", group: 1, period: 2, state: "Sólido", shells: [2, 1], desc: "Metal alcalino muy blando y de baja densidad. Posee alta reactividad con el agua.", curiosity: "Clave en la fabricación de baterías recargables para celulares y vehículos eléctricos en la transición energética." },
+            { z: 4, sym: "Be", name: "Berilio", mass: 9.0122, cat: "alkaline", group: 2, period: 2, state: "Sólido", shells: [2, 2], desc: "Metal alcalinotérreo liviano y rígido, de alto punto de fusión.", curiosity: "Usado en aleaciones estructurales para la industria aeroespacial y espejos de telescopios espaciales." },
+            { z: 5, sym: "B", name: "Boro", mass: 10.81, cat: "metalloid", group: 13, period: 2, state: "Sólido", shells: [2, 3], desc: "Metaloide semiconductor utilizado en vidrio borosilicato de alta resistencia térmica.", curiosity: "Presente en fertilizantes agrícolas para optimizar cultivos vitivinícolas." },
+            { z: 6, sym: "C", name: "Carbono", mass: 12.011, cat: "nonmetal", group: 14, period: 2, state: "Sólido", shells: [2, 4], desc: "Base fundamental de la química orgánica y de la vida. Forma estructuras como el grafito y el diamante.", curiosity: "Está presente en todos los azúcares y ácidos orgánicos del mosto de la uva." },
+            { z: 7, sym: "N", name: "Nitrógeno", mass: 14.007, cat: "nonmetal", group: 15, period: 2, state: "Gas", shells: [2, 5], desc: "Constituye aproximadamente el 78% del aire que respiramos. Esencial para aminoácidos.", curiosity: "Usado como atmósfera inerte en el embotellado de vinos para evitar su oxidación." },
+            { z: 8, sym: "O", name: "Oxígeno", mass: 15.999, cat: "nonmetal", group: 16, period: 2, state: "Gas", shells: [2, 6], desc: "Elemento indispensable para la respiración celular y la combustión.", curiosity: "Forma la capa de ozono (O₃) que protege la región cordillerana de la radiación UV." },
+            { z: 9, sym: "F", name: "Flúor", mass: 18.998, cat: "halogen", group: 17, period: 2, state: "Gas", shells: [2, 7], desc: "El halógeno y elemento más electronegativo de toda la tabla periódica.", curiosity: "Añadido en sales y pastas dentales para prevenir las caries fortaleciendo el esmalte." },
+            { z: 10, sym: "Ne", name: "Neón", mass: 20.180, cat: "noble", group: 18, period: 2, state: "Gas", shells: [2, 8], desc: "Gas noble que emite un resplandor anaranjado brillante cuando se somete a descargas eléctricas.", curiosity: "Muy utilizado en letreros luminosos comerciales e iluminación publicitaria." },
+
+            /* Periodo 3 */
+            { z: 11, sym: "Na", name: "Sodio", mass: 22.990, cat: "alkali", group: 1, period: 3, state: "Sólido", shells: [2, 8, 1], desc: "Metal alcalino blando que reacciona de forma violenta al contacto con el agua.", curiosity: "Junto al cloro forma la sal común (NaCl), regulador osmótico vital." },
+            { z: 12, sym: "Mg", name: "Magnesio", mass: 24.305, cat: "alkaline", group: 2, period: 3, state: "Sólido", shells: [2, 8, 2], desc: "Metal liviano esencial en la clorofila de las plantas para realizar la fotosíntesis.", curiosity: "Fundamental en la nutrición vegetal de los viñedos y frutales mendocinos." },
+            { z: 13, sym: "Al", name: "Aluminio", mass: 26.982, cat: "post-transition", group: 13, period: 3, state: "Sólido", shells: [2, 8, 3], desc: "Metal de baja densidad, alta resistencia a la corrosión y excelente reciclabilidad.", curiosity: "Ampliamente utilizado en latas de bebidas y carpintería metálica." },
+            { z: 14, sym: "Si", name: "Silicio", mass: 28.085, cat: "metalloid", group: 14, period: 3, state: "Sólido", shells: [2, 8, 4], desc: "Metaloide semiconductor clave en la tecnología microelectrónica y paneles solares.", curiosity: "Es el componente principal de las arenas e industria del vidrio." },
+            { z: 15, sym: "P", name: "Fósforo", mass: 30.974, cat: "nonmetal", group: 15, period: 3, state: "Sólido", shells: [2, 8, 5], desc: "Elemento esencial para la vida, componente clave de la molécula de ATP y ADN.", curiosity: "Utilizado en la fabricación de cerillas, fertilizantes y detergentes." },
+            { z: 16, sym: "S", name: "Azufre", mass: 32.06, cat: "nonmetal", group: 16, period: 3, state: "Sólido", shells: [2, 8, 6], desc: "No metal de color amarillo característico, constituyente de aminoácidos esenciales.", curiosity: "Utilizado tradicionalmente en la agronomía para combatir hongos como el oídio en la vid." },
+            { z: 17, sym: "Cl", name: "Cloro", mass: 35.45, cat: "halogen", group: 17, period: 3, state: "Gas", shells: [2, 8, 7], desc: "Halógeno altamente reactivo utilizado para la potabilización y desinfección del agua.", curiosity: "Garantiza la pureza del agua potable en la red de abastecimiento urbano." },
+            { z: 18, sym: "Ar", name: "Argón", mass: 39.948, cat: "noble", group: 18, period: 3, state: "Gas", shells: [2, 8, 8], desc: "Gas inerte abundante en la atmósfera terrestre (casi el 1%).", curiosity: "Usado en soldadura eléctrica industrial para proteger el metal de la oxidación." },
+
+            /* Periodo 4 destacado */
+            { z: 19, sym: "K", name: "Potasio", mass: 39.098, cat: "alkali", group: 1, period: 4, state: "Sólido", shells: [2, 8, 8, 1], desc: "Metal alcalino crucial para el impulso nervioso y la conducción eléctrica cardíaca.", curiosity: "Nutriente indispensable en el suelo agrícola para lograr la maduración equilibrada del fruto." },
+            { z: 20, sym: "Ca", name: "Calcio", mass: 40.078, cat: "alkaline", group: 2, period: 4, state: "Sólido", shells: [2, 8, 8, 2], desc: "Metal alcalinotérreo esencial para los huesos, dientes y la pared celular vegetal.", curiosity: "Presente en el lecho rocoso calizo de la Precordillera y Valle de Uco." },
+            { z: 21, sym: "Sc", name: "Escandio", mass: 44.956, cat: "transition", group: 3, period: 4, state: "Sólido", shells: [2, 8, 9, 2], desc: "Metal de transición suave utilizado en aleaciones aeroespaciales avanzadas.", curiosity: "Mejora la tenacidad de aleaciones de aluminio para marcos de bicicletas de competición." },
+            { z: 22, sym: "Ti", name: "Titanio", mass: 47.867, cat: "transition", group: 4, period: 4, state: "Sólido", shells: [2, 8, 10, 2], desc: "Metal muy resistente a la corrosión y con excelente relación resistencia/peso.", curiosity: "Utilizado en prótesis médicas e implantes debido a su elevada biocompatibilidad." },
+            { z: 23, sym: "V", name: "Vanadio", mass: 50.942, cat: "transition", group: 5, period: 4, state: "Sólido", shells: [2, 8, 11, 2], desc: "Metal duro que refuerza aceros en herramientas mecánicas.", curiosity: "Se agrega al acero para fabricar llaves e instrumentos de taller mecánico." },
+            { z: 24, sym: "Cr", name: "Cromo", mass: 51.996, cat: "transition", group: 6, period: 4, state: "Sólido", shells: [2, 8, 13, 1], desc: "Metal brillante que otorga propiedades inoxidables al acero.", curiosity: "Da el recubrimiento cromado anticorrosivo a piezas metálicas y tanques industriales." },
+            { z: 25, sym: "Mn", name: "Manganeso", mass: 54.938, cat: "transition", group: 7, period: 4, state: "Sólido", shells: [2, 8, 13, 2], desc: "Elemento clave en la siderurgia para desoxidar el acero.", curiosity: "Crucial en la fabricación de rieles ferroviarios y estructuras de alta tracción." },
+            { z: 26, sym: "Fe", name: "Hierro", mass: 55.845, cat: "transition", group: 8, period: 4, state: "Sólido", shells: [2, 8, 14, 2], desc: "El metal de transición más utilizado en la historia humana. Transporta oxígeno en la hemoglobina.", curiosity: "Base estructural de puentes, maquinarias agrícolas y construcción sísmica." },
+            { z: 27, sym: "Co", name: "Cobalto", mass: 58.933, cat: "transition", group: 9, period: 4, state: "Sólido", shells: [2, 8, 15, 2], desc: "Metal ferromagnético utilizado en pigmentos azul cobalto y superaleaciones.", curiosity: "Presente en la vitamina B12 (cobalamina), esencial para el sistema nervioso." },
+            { z: 28, sym: "Ni", name: "Níquel", mass: 58.693, cat: "transition", group: 10, period: 4, state: "Sólido", shells: [2, 8, 16, 2], desc: "Resistente a la oxidación, utilizado en acuñación de monedas y baterías de litio-níquel.", curiosity: "Componente esencial de las monedas metálicas de curso legal." },
+            { z: 29, sym: "Cu", name: "Cobre", mass: 63.546, cat: "transition", group: 11, period: 4, state: "Sólido", shells: [2, 8, 18, 1], desc: "Excelente conductor térmico y eléctrico de color rojizo.", curiosity: "Se utiliza en los tendidos de la red eléctrica nacional y tuberías de agua." },
+            { z: 30, sym: "Zn", name: "Zinc", mass: 65.38, cat: "transition", group: 12, period: 4, state: "Sólido", shells: [2, 8, 18, 2], desc: "Metal galvanizador que previene la corrosión del hierro.", curiosity: "Usado en chapas galvanizadas para techos y en la enzima anhidrasa carbónica." },
+            { z: 31, sym: "Ga", name: "Galio", mass: 69.723, cat: "post-transition", group: 13, period: 4, state: "Sólido", shells: [2, 8, 18, 3], desc: "Metal curioso que se derrite a temperatura corporal (29.7°C).", curiosity: "Componente esencial de semiconductores de arseniuro de galio para LED." },
+            { z: 32, sym: "Ge", name: "Germanio", mass: 72.630, cat: "metalloid", group: 14, period: 4, state: "Sólido", shells: [2, 8, 18, 4], desc: "Metaloide semiconductor clave en la primera era de los transistores y óptica infrarroja.", curiosity: "Se emplea en lentes de visión nocturna y fibra óptica de telecomunicaciones." },
+            { z: 33, sym: "As", name: "Arsénico", mass: 74.922, cat: "metalloid", group: 15, period: 4, state: "Sólido", shells: [2, 8, 18, 5], desc: "Metaloide tóxico cuyos compuestos requieren estricto control ambiental en agua de pozo.", curiosity: "Objeto de estudio constante en análisis de calidad de agua subterránea." },
+            { z: 34, sym: "Se", name: "Selenio", mass: 78.971, cat: "nonmetal", group: 16, period: 4, state: "Sólido", shells: [2, 8, 18, 6], desc: "Fotoconductor que conduce mejor la electricidad al recibir luz.", curiosity: "Usado en fotocopiadoras, celdas solares y suplementos antioxidantes." },
+            { z: 35, sym: "Br", name: "Bromo", mass: 79.904, cat: "halogen", group: 17, period: 4, state: "Líquido", shells: [2, 8, 18, 7], desc: "Único no metal que es líquido a temperatura ambiente, de color rojo parduzco.", curiosity: "Se emplea en retardantes de llama y en la industria farmacéutica." },
+            { z: 36, sym: "Kr", name: "Kriptón", mass: 83.798, cat: "noble", group: 18, period: 4, state: "Gas", shells: [2, 8, 18, 8], desc: "Gas noble utilizado en iluminación fluorescente y láseres de alta precisión.", curiosity: "Utilizado en ventanas de doble vidriado hermético (DVH) para aislamiento térmico." },
+
+        ];
+
+        // Función auxiliar para auto-generar los elementos restantes hasta el 118 si no están definidos expresamente
+        const defaultCategories = [
+            "alkali", "alkaline", "transition", "post-transition", "metalloid", 
+            "nonmetal", "halogen", "noble", "lanthanide", "actinide"
+        ];
+
+        // Mapeo preciso de posiciones y datos genéricos para el resto hasta completar Z=118
+        const fullElementsList = [];
+        
+        // Elementos adicionales predefinidos clave (Lantánidos/Actínidos y pesados)
+        const specificExtraData = {
+            47: { sym: "Ag", name: "Plata", cat: "transition", group: 11, period: 5, shells: [2, 8, 18, 18, 1], desc: "Metal noble con la mayor conductividad eléctrica y térmica.", curiosity: "Utilizado en la elaboración de contactos eléctricos de precisión y orfebrería." },
+            79: { sym: "Au", name: "Oro", cat: "transition", group: 11, period: 6, shells: [2, 8, 18, 32, 18, 1], desc: "Metal precioso inerte, altamente maleable y dúctil.", curiosity: "Símbolo de reserva de valor internacional e industria electrónica de conectores." },
+            80: { sym: "Hg", name: "Mercurio", cat: "transition", group: 12, period: 6, shells: [2, 8, 18, 32, 18, 2], desc: "Único metal que permanece líquido a temperatura ambiente.", curiosity: "Históricamente utilizado en termómetros climáticos y barómetros." },
+
+            // Lantánidos (57 - 71)
+            57: { sym: "La", name: "Lantano", cat: "lanthanide", group: 3, period: 6, shells: [2, 8, 18, 18, 9, 2], desc: "Primer elemento de la serie de los lantánidos o tierras raras.", curiosity: "Utilizado en lentes de cámaras fotográficas de alta resolución." },
+            58: { sym: "Ce", name: "Cerio", cat: "lanthanide", group: 3, period: 6, shells: [2, 8, 18, 19, 9, 2], desc: "El más abundante de las tierras raras.", curiosity: "Componente de las piedras de encendedores para generar chispas." },
+            60: { sym: "Nd", name: "Neodimio", cat: "lanthanide", group: 3, period: 6, shells: [2, 8, 18, 22, 8, 2], desc: "Lantánido que forma los imanes permanentes más potentes conocidos.", curiosity: "Usado en los motores de autos híbridos y en auriculares modernos." },
+
+            // Actínidos (89 - 103)
+            89: { sym: "Ac", name: "Actinio", cat: "actinide", group: 3, period: 7, shells: [2, 8, 18, 32, 18, 9, 2], desc: "Elemento radiactivo que emite una fuerte luz azul en la oscuridad.", curiosity: "Estudiado en medicina nuclear para terapias de radiación dirigida." },
+            92: { sym: "U", name: "Uranio", cat: "actinide", group: 3, period: 7, shells: [2, 8, 18, 32, 21, 9, 2], desc: "Actínido denso y radiactivo clave en la generación de energía nuclear.", curiosity: "Elemento primordial para la fisión en centrales nucleares de potencia." },
+            94: { sym: "Pu", name: "Plutonio", cat: "actinide", group: 3, period: 7, shells: [2, 8, 18, 32, 24, 8, 2], desc: "Elemento sintético radiactivo producido en reactores nucleares.", curiosity: "Utilizado como fuente de calor en generadores termoeléctricos de sondas espaciales." }
+        };
+
+        // Nombres de elementos estándar hasta 118
+        const allNames = [
+            "Hidrógeno","Helio","Litio","Berilio","Boro","Carbono","Nitrógeno","Oxígeno","Flúor","Neón",
+            "Sodio","Magnesio","Aluminio","Silicio","Fósforo","Azufre","Cloro","Argón","Potasio","Calcio",
+            "Escandio","Titanio","Vanadio","Cromo","Manganeso","Hierro","Cobalto","Níquel","Cobre","Zinc",
+            "Galio","Germanio","Arsénico","Selenio","Bromo","Kriptón","Rubidio","Estroncio","Itrio","Zirconio",
+            "Niobio","Molibdeno","Tecnecio","Rutenio","Rodio","Paladio","Plata","Cadmio","Indio","Estaño",
+            "Antimonio","Teluro","Yodo","Xenón","Cesio","Bario","Lantano","Cerio","Praseodimio","Neodimio",
+            "Prometio","Samario","Europio","Gadolinio","Terbio","Disprosio","Holmio","Erbio","Tulio","Iterbio",
+            "Lutecio","Hafnio","Tantalio","Tungsteno","Renio","Osmio","Iridio","Platino","Oro","Mercurio",
+            "Talio","Plomo","Bismuto","Polonio","Astato","Radón","Francio","Radio","Actinio","Torio",
+            "Protactinio","Uranio","Neptunio","Plutonio","Americio","Curio","Berkelio","Californio","Einsteinio","Fermio",
+            "Mendelevio","Nobelio","Laurencio","Rutherfordio","Dubnio","Seaborgio","Bohrio","Hassio","Meitnerio","Darmstadtio",
+            "Roentgenio","Copernicio","Nihonio","Flerovio","Moscovio","Livermorio","Teneso","Oganesón"
+        ];
+
+        const allSymbols = [
+            "H","He","Li","Be","B","C","N","O","F","Ne","Na","Mg","Al","Si","P","S","Cl","Ar","K","Ca",
+            "Sc","Ti","V","Cr","Mn","Fe","Co","Ni","Cu","Zn","Ga","Ge","As","Se","Br","Kr","Rb","Sr","Y","Zr",
+            "Nb","Mo","Tc","Ru","Rh","Pd","Ag","Cd","In","Sn","Sb","Te","I","Xe","Cs","Ba","La","Ce","Pr","Nd",
+            "Pm","Sm","Eu","Gd","Tb","Dy","Ho","Er","Tm","Yb","Lu","Hf","Ta","W","Re","Os","Ir","Pt","Au","Hg",
+            "Tl","Pb","Bi","Po","At","Rn","Fr","Ra","Ac","Th","Pa","U","Np","Pu","Am","Cm","Bk","Cf","Es","Fm",
+            "Md","No","Lr","Rf","Db","Sg","Bh","Hs","Mt","Ds","Rg","Cn","Nh","Fl","Mc","Lv","Ts","Og"
+        ];
+
+        // Función para derivar Periodo y Grupo estándar
+        function getGroupPeriod(z) {
+            if (z === 1) return { period: 1, group: 1 };
+            if (z === 2) return { period: 1, group: 18 };
+            if (z >= 3 && z <= 4) return { period: 2, group: z - 2 };
+            if (z >= 5 && z <= 10) return { period: 2, group: z + 8 };
+            if (z >= 11 && z <= 12) return { period: 3, group: z - 10 };
+            if (z >= 13 && z <= 18) return { period: 3, group: z };
+            if (z >= 19 && z <= 36) return { period: 4, group: z - 18 };
+            if (z >= 37 && z <= 54) return { period: 5, group: z - 36 };
+            if (z >= 55 && z <= 56) return { period: 6, group: z - 54 };
+            if (z >= 57 && z <= 71) return { period: 6, group: z - 54, isLanthanide: true }; // Lantánidos
+            if (z >= 72 && z <= 86) return { period: 6, group: z - 68 };
+            if (z >= 87 && z <= 88) return { period: 7, group: z - 86 };
+            if (z >= 89 && z <= 103) return { period: 7, group: z - 86, isActinide: true }; // Actínidos
+            if (z >= 104 && z <= 118) return { period: 7, group: z - 100 };
+            return { period: 1, group: 1 };
+        }
+
+        // Determinar categoría por N° atómico si no está explícita
+        function autoCategory(z) {
+            if ([3,11,19,37,55,87].includes(z)) return "alkali";
+            if ([4,12,20,38,56,88].includes(z)) return "alkaline";
+            if ((z>=21 && z<=30)||(z>=39 && z<=48)||(z>=72 && z<=80)||(z>=104 && z<=112)) return "transition";
+            if ([13,31,49,50,81,82,83,84,113,114,115,116].includes(z)) return "post-transition";
+            if ([5,14,32,33,51,52,85].includes(z)) return "metalloid";
+            if ([1,6,7,8,15,16,34].includes(z)) return "nonmetal";
+            if ([9,17,35,53,117].includes(z)) return "halogen";
+            if ([2,10,18,36,54,86,118].includes(z)) return "noble";
+            if (z>=57 && z<=71) return "lanthanide";
+            if (z>=89 && z<=103) return "actinide";
+            return "unknown";
+        }
+
+        // Generar capas electrónicas aproximadas según regla del modelo de Bohr
+        function generateBohrShells(z) {
+            let remaining = z;
+            const maxCapacities = [2, 8, 18, 32, 32, 18, 8];
+            const shells = [];
+            for (let cap of maxCapacities) {
+                if (remaining <= 0) break;
+                let take = Math.min(remaining, cap);
+                shells.push(take);
+                remaining -= take;
+            }
+            return shells;
+        }
+
+        // Construir la lista consolidada de 118 elementos
+        for (let i = 1; i <= 118; i++) {
+            const pre = elementsData.find(e => e.z === i);
+            if (pre) {
+                fullElementsList.push(pre);
+            } else if (specificExtraData[i]) {
+                const sp = specificExtraData[i];
+                const pg = getGroupPeriod(i);
+                fullElementsList.push({
+                    z: i,
+                    sym: sp.sym,
+                    name: sp.name,
+                    mass: parseFloat((i * 2.3).toFixed(2)),
+                    cat: sp.cat,
+                    group: pg.group,
+                    period: pg.period,
+                    state: i > 92 ? "Sintético" : "Sólido",
+                    shells: sp.shells || generateBohrShells(i),
+                    desc: sp.desc,
+                    curiosity: sp.curiosity
+                });
+            } else {
+                const pg = getGroupPeriod(i);
+                const cat = autoCategory(i);
+                fullElementsList.push({
+                    z: i,
+                    sym: allSymbols[i - 1] || `E${i}`,
+                    name: allNames[i - 1] || `Elemento ${i}`,
+                    mass: parseFloat((i * 2.25 + (i > 20 ? 4 : 0)).toFixed(2)),
+                    cat: cat,
+                    group: pg.group,
+                    period: pg.period,
+                    state: i > 92 ? "Sintético" : (i === 35 || i === 80 ? "Líquido" : (i === 1 || i === 2 || i === 7 || i === 8 || i === 9 || i === 10 || i === 17 || i === 18 || i === 36 || i === 54 || i === 86 ? "Gas" : "Sólido")),
+                    shells: generateBohrShells(i),
+                    desc: `Elemento químico número atómico ${i}. Se clasifica como ${cat} en la tabla periódica.`,
+                    curiosity: `Estudiado en la física de partículas y química nuclear contemporánea.`
+                });
+            }
+        }
+
+        // RENDERIZADO DE LA TABLA PERIÓDICA EN EL DOM
+        const gridContainer = document.getElementById('periodicGrid');
+        const lanthanidesContainer = document.getElementById('lanthanidesActinidesGrid');
+
+        function createCardHTML(element) {
+            const protons = element.z;
+            const neutrons = Math.round(element.mass) - protons;
+            const electrons = protons;
+
+            return `
+                <div data-z="${element.z}" 
+                     data-category="${element.cat}" 
+                     class="element-card bg-${element.cat} border p-1 rounded-lg cursor-pointer flex flex-col justify-between h-16 sm:h-20 text-white relative shadow-sm">
+                    <div class="flex justify-between items-center text-[9px] sm:text-[10px] font-mono leading-none">
+                        <span class="font-bold opacity-90">${element.z}</span>
+                        <span class="opacity-75 hidden sm:inline">${element.mass.toFixed(1)}</span>
+                    </div>
+                    <div class="text-center my-auto">
+                        <span class="text-sm sm:text-lg font-black tracking-wider leading-none block">${element.sym}</span>
+                        <span class="text-[9px] sm:text-[10px] truncate block opacity-90 font-medium">${element.name}</span>
+                    </div>
+                    <div class="text-[8px] text-center opacity-70 hidden sm:block font-mono">
+                        ${element.shells.join('.')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPeriodicTable() {
+            gridContainer.innerHTML = '';
+            lanthanidesContainer.innerHTML = '';
+
+            // Crear matriz para los 7 periodos y 18 grupos
+            for (let p = 1; p <= 7; p++) {
+                for (let g = 1; g <= 18; g++) {
+                    // Buscar elemento que corresponda a este periodo y grupo
+                    const el = fullElementsList.find(e => e.period === p && e.group === g && !(e.z >= 57 && e.z <= 71) && !(e.z >= 89 && e.z <= 103));
+                    
+                    if (el) {
+                        gridContainer.innerHTML += createCardHTML(el);
+                    } else {
+                        // Huecos especiales para resaltar el bloque de lantánidos/actínidos
+                        if (p === 6 && g === 3) {
+                            gridContainer.innerHTML += `
+                                <div class="border border-dashed border-pink-500/40 bg-pink-950/20 rounded-lg p-1 flex items-center justify-center text-center text-[10px] text-pink-300 font-bold leading-tight">
+                                    57-71<br><span class="text-[8px] font-normal">La-Lu</span>
+                                </div>
+                            `;
+                        } else if (p === 7 && g === 3) {
+                            gridContainer.innerHTML += `
+                                <div class="border border-dashed border-fuchsia-500/40 bg-fuchsia-950/20 rounded-lg p-1 flex items-center justify-center text-center text-[10px] text-fuchsia-300 font-bold leading-tight">
+                                    89-103<br><span class="text-[8px] font-normal">Ac-Lr</span>
+                                </div>
+                            `;
+                        } else {
+                            gridContainer.innerHTML += `<div class="pointer-events-none"></div>`;
+                        }
+                    }
+                }
+            }
+
+            // Renderizar Lantánidos (57 a 71) y Actínidos (89 a 103)
+            const lants = fullElementsList.filter(e => e.z >= 57 && e.z <= 71);
+            const acts = fullElementsList.filter(e => e.z >= 89 && e.z <= 103);
+
+            // Relleno inicial para alinear con columna 3
+            lanthanidesContainer.innerHTML += `<div class="col-span-2 pointer-events-none"></div>`;
+            lants.forEach(el => lanthanidesContainer.innerHTML += createCardHTML(el));
+            lanthanidesContainer.innerHTML += `<div class="col-span-1 pointer-events-none"></div>`;
+
+            lanthanidesContainer.innerHTML += `<div class="col-span-2 pointer-events-none"></div>`;
+            acts.forEach(el => lanthanidesContainer.innerHTML += createCardHTML(el));
+            lanthanidesContainer.innerHTML += `<div class="col-span-1 pointer-events-none"></div>`;
+
+            // Adjuntar eventos de clic
+            document.querySelectorAll('.element-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const z = parseInt(card.getAttribute('data-z'));
+                    openElementModal(z);
+                });
+            });
+        }
+
+        // MOTOR 3D THREE.JS PARA EL MODELO ATÓMICO DE BOHR
+        let scene, camera, renderer, controls;
+        let nucleusGroup, electronsGroup, orbitsGroup;
+        let animationFrameId = null;
+
+        function initThreeJS() {
+            const container = document.getElementById('bohr3dCanvasContainer');
+            container.innerHTML = '';
+
+            const width = container.clientWidth || 350;
+            const height = container.clientHeight || 280;
+
+            // Escena
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0f1d);
+
+            // Cámara
+            camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            camera.position.set(0, 15, 30);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Controles de Órbita
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxDistance = 60;
+            controls.minDistance = 5;
+
+            // Iluminación
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+
+            const pointLight = new THREE.PointLight(0xffb703, 1.5, 100);
+            pointLight.position.set(10, 20, 15);
+            scene.add(pointLight);
+
+            const backLight = new THREE.PointLight(0x3a86ff, 1, 100);
+            backLight.position.set(-10, -10, -15);
+            scene.add(backLight);
+
+            // Grupos de objetos
+            nucleusGroup = new THREE.Group();
+            electronsGroup = new THREE.Group();
+            orbitsGroup = new THREE.Group();
+
+            scene.add(nucleusGroup);
+            scene.add(electronsGroup);
+            scene.add(orbitsGroup);
+
+            // Resize Handler
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('bohr3dCanvasContainer');
+            if (!container || !renderer || !camera) return;
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            if (width > 0 && height > 0) {
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+                renderer.setSize(width, height);
+            }
+        }
+
+        // CONSTRUCCIÓN DEL NÚCLEO Y ÓRBITAS DE ELECTRONES
+        function build3DBohrModel(element) {
+            if (!scene) initThreeJS();
+
+            // Limpiar grupos previos
+            while (nucleusGroup.children.length > 0) nucleusGroup.remove(nucleusGroup.children[0]);
+            while (electronsGroup.children.length > 0) electronsGroup.remove(electronsGroup.children[0]);
+            while (orbitsGroup.children.length > 0) orbitsGroup.remove(orbitsGroup.children[0]);
+
+            const protonsCount = element.z;
+            const neutronsCount = Math.max(0, Math.round(element.mass) - protonsCount);
+
+            // Geometrías y Materiales Compartidos
+            const pGeo = new THREE.SphereGeometry(0.5, 16, 16);
+            const pMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.3, metalness: 0.2, emissive: 0x991b1b, emissiveIntensity: 0.2 });
+
+            const nGeo = new THREE.SphereGeometry(0.5, 16, 16);
+            const nMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, roughness: 0.4, metalness: 0.1, emissive: 0x1e40af, emissiveIntensity: 0.2 });
+
+            const eGeo = new THREE.SphereGeometry(0.35, 16, 16);
+            const eMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.1, metalness: 0.8, emissive: 0xeab308, emissiveIntensity: 0.6 });
+
+            // 1. Construir Núcleo Apilado (Protones + Neutrones)
+            const totalParticles = Math.min(protonsCount + neutronsCount, 80); // Límite visual para rendimiento
+            const radius = Math.cbrt(totalParticles) * 0.75 + 0.5;
+
+            let pAdded = 0;
+            let nAdded = 0;
+
+            for (let i = 0; i < totalParticles; i++) {
+                // Posición aleatoria esférica apretada
+                const u = Math.random();
+                const v = Math.random();
+                const theta = u * 2.0 * Math.PI;
+                const phi = Math.acos(2.0 * v - 1.0);
+                const r = Math.cbrt(Math.random()) * radius;
+
+                const x = r * Math.sin(phi) * Math.cos(theta);
+                const y = r * Math.sin(phi) * Math.sin(theta);
+                const z = r * Math.cos(phi);
+
+                let mesh;
+                if ((i % 2 === 0 && pAdded < protonsCount) || nAdded >= neutronsCount) {
+                    mesh = new THREE.Mesh(pGeo, pMat);
+                    pAdded++;
+                } else {
+                    mesh = new THREE.Mesh(nGeo, nMat);
+                    nAdded++;
+                }
+                mesh.position.set(x, y, z);
+                nucleusGroup.add(mesh);
+            }
+
+            // 2. Construir Niveles Energéticos (Órbitas) y Electrones
+            const shells = element.shells;
+            const electronsData = [];
+
+            shells.forEach((count, shellIdx) => {
+                const orbitRadius = radius + 3.5 + (shellIdx * 2.8);
+                
+                // Dibujar Anillo de Órbita
+                const ringGeo = new THREE.RingGeometry(orbitRadius - 0.05, orbitRadius + 0.05, 64);
+                const ringMat = new THREE.MeshBasicMaterial({ color: 0x64748b, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
+                const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+                ringMesh.rotation.x = Math.PI / 2;
+                
+                // Inclinación ligeramente variable por nivel para dinamismo 3D
+                const orbitPivot = new THREE.Group();
+                orbitPivot.rotation.x = (shellIdx * 0.2);
+                orbitPivot.rotation.z = (shellIdx * 0.15);
+                orbitPivot.add(ringMesh);
+                orbitsGroup.add(orbitPivot);
+
+                // Agregar Electrones repartidos uniformemente en la órbita
+                for (let e = 0; e < count; e++) {
+                    const angle = (e / count) * Math.PI * 2;
+                    const electronMesh = new THREE.Mesh(eGeo, eMat);
+                    
+                    orbitPivot.add(electronMesh);
+
+                    electronsData.push({
+                        mesh: electronMesh,
+                        pivot: orbitPivot,
+                        radius: orbitRadius,
+                        angle: angle,
+                        speed: 0.02 + (0.01 / (shellIdx + 1)) // Más cerca del núcleo orbitan más rápido
+                    });
+                }
+            });
+
+            // Ajustar la cámara según el tamaño atómico
+            const maxRadius = radius + 3.5 + (shells.length * 2.8);
+            camera.position.set(0, maxRadius * 0.8, maxRadius * 1.6);
+            controls.target.set(0, 0, 0);
+            controls.update();
+
+            // Loop de Animación
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+            function animate() {
+                animationFrameId = requestAnimationFrame(animate);
+
+                // Rotación suave del núcleo
+                nucleusGroup.rotation.y += 0.003;
+                nucleusGroup.rotation.x += 0.001;
+
+                // Animación orbital de los electrones
+                electronsData.forEach(eObj => {
+                    eObj.angle += eObj.speed;
+                    eObj.mesh.position.x = Math.cos(eObj.angle) * eObj.radius;
+                    eObj.mesh.position.z = Math.sin(eObj.angle) * eObj.radius;
+                });
+
+                controls.update();
+                renderer.render(scene, camera);
+            }
+
+            animate();
+        }
+
+        // MODAL Y DETALLES DEL ELEMENTO
+        const modal = document.getElementById('elementModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        function openElementModal(z) {
+            const el = fullElementsList.find(e => e.z === z);
+            if (!el) return;
+
+            const protons = el.z;
+            const neutrons = Math.max(0, Math.round(el.mass) - protons);
+            const electrons = protons;
+
+            // Actualizar textos e información
+            document.getElementById('modalZ').textContent = el.z;
+            document.getElementById('modalElementName').textContent = el.name;
+            document.getElementById('modalElementEnglish').textContent = `Símbolo Químico: ${el.sym} • Número Atómico: ${el.z}`;
+            document.getElementById('modalSymbol').textContent = el.sym;
+            document.getElementById('modalMassHeader').textContent = el.mass.toFixed(2);
+            document.getElementById('modalAtomicMass').textContent = `${el.mass.toFixed(3)} u`;
+            document.getElementById('modalState').textContent = el.state;
+            document.getElementById('modalPeriodGroup').textContent = `Período ${el.period} / Grupo ${el.group}`;
+            document.getElementById('modalBohrShells').textContent = el.shells.join(', ');
+
+            document.getElementById('modalProtonsCount').textContent = protons;
+            document.getElementById('modalNeutronsCount').textContent = neutrons;
+            document.getElementById('modalElectronsCount').textContent = electrons;
+
+            document.getElementById('modalDescription').textContent = el.desc;
+            document.getElementById('modalCuriosity').textContent = el.curiosity;
+
+            // Estilos por categoría
+            const catBadge = document.getElementById('modalElementCategoryBadge');
+            const symBox = document.getElementById('modalSymbolBox');
+            
+            catBadge.textContent = getCategoryNameES(el.cat);
+            catBadge.className = `text-[11px] px-2.5 py-0.5 rounded-full font-semibold bg-${el.cat}/20 border border-${el.cat}/50 text-${el.cat}`;
+
+            symBox.className = `w-16 h-16 rounded-xl flex flex-col items-center justify-center font-black border-2 shadow-lg bg-${el.cat} text-white`;
+
+            // Mostrar Modal
+            modal.classList.remove('hidden');
+
+            // Renderizar 3D Bohr
+            setTimeout(() => {
+                initThreeJS();
+                build3DBohrModel(el);
+            }, 50);
+        }
+
+        function getCategoryNameES(cat) {
+            const map = {
+                'alkali': 'Metal Alcalino',
+                'alkaline': 'Alcalinotérreo',
+                'transition': 'Metal de Transición',
+                'post-transition': 'Otros Metales',
+                'metalloid': 'Metaloide',
+                'nonmetal': 'No Metal Reactivo',
+                'halogen': 'Halógeno',
+                'noble': 'Gas Noble',
+                'lanthanide': 'Lantánido',
+                'actinide': 'Actínido',
+                'unknown': 'Sintético / Desconocido'
+            };
+            return map[cat] || cat;
+        }
+
+        closeModalBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+                if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            }
+        });
+
+        // BÚSQUEDA Y FILTRADO
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        const filterBtns = document.querySelectorAll('.cat-filter-btn');
+        const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+
+        let activeCategory = null;
+
+        function filterElements() {
+            const query = searchInput.value.trim().toLowerCase();
+            const cards = document.querySelectorAll('.element-card');
+
+            cards.forEach(card => {
+                const z = card.getAttribute('data-z');
+                const cat = card.getAttribute('data-category');
+                const el = fullElementsList.find(e => e.z === parseInt(z));
+
+                if (!el) return;
+
+                const matchesSearch = !query || 
+                    el.name.toLowerCase().includes(query) || 
+                    el.sym.toLowerCase().includes(query) || 
+                    el.z.toString() === query;
+
+                const matchesCat = !activeCategory || cat === activeCategory;
+
+                if (matchesSearch && matchesCat) {
+                    card.classList.remove('dimmed');
+                    if (query && (el.sym.toLowerCase() === query || el.z.toString() === query)) {
+                        card.classList.add('highlighted');
+                    } else {
+                        card.classList.remove('highlighted');
+                    }
+                } else {
+                    card.classList.add('dimmed');
+                    card.classList.remove('highlighted');
+                }
+            });
+
+            clearSearchBtn.classList.toggle('hidden', !query);
+        }
+
+        searchInput.addEventListener('input', filterElements);
+
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            filterElements();
+        });
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const cat = btn.getAttribute('data-category');
+                
+                if (activeCategory === cat) {
+                    activeCategory = null;
+                    btn.classList.remove('ring-2', 'ring-amber-400');
+                } else {
+                    filterBtns.forEach(b => b.classList.remove('ring-2', 'ring-amber-400'));
+                    activeCategory = cat;
+                    btn.classList.add('ring-2', 'ring-amber-400');
+                }
+                filterElements();
+            });
+        });
+
+        resetFiltersBtn.addEventListener('click', () => {
+            activeCategory = null;
+            searchInput.value = '';
+            filterBtns.forEach(b => b.classList.remove('ring-2', 'ring-amber-400'));
+            filterElements();
+        });
+
+        // QUIZ EDUCATIVO DE QUÍMICA
+        const quizModal = document.getElementById('quizModal');
+        const btnQuiz = document.getElementById('btnQuiz');
+        const closeQuizBtn = document.getElementById('closeQuizBtn');
+
+        const quizQuestions = [
+            {
+                q: "¿Qué partícula subatómica posee carga positiva y determina el Número Atómico (Z)?",
+                options: ["Electrón", "Protón", "Neutrón", "Fotón"],
+                correct: 1,
+                exp: "Los protones ($p^+$) tienen carga positiva y su cantidad define la identidad química de un elemento (Z)."
+            },
+            {
+                q: "¿En qué grupo de la tabla periódica se ubican los Gases Nobles?",
+                options: ["Grupo 1", "Grupo 17", "Grupo 18", "Grupo 2"],
+                correct: 2,
+                exp: "Los Gases Nobles se ubican en el Grupo 18 y destacan por su configuración de capa completa y gran estabilidad."
+            },
+            {
+                q: "Si un átomo neutro de Sodio (Na) tiene Z = 11 y Masa = 23, ¿cuántos neutrones tiene?",
+                options: ["11", "12", "23", "34"],
+                correct: 1,
+                exp: "Número de neutrones = Masa Atómica (A) - Número Atómico (Z) = 23 - 11 = 12 neutrones."
+            },
+            {
+                q: "¿Qué postula el modelo atómico de Bohr sobre los electrones?",
+                options: [
+                    "Giran en órbitas circulares definidas con niveles energéticos cuantizados.",
+                    "Están incrustados en una masa de carga positiva como un budín.",
+                    "Se encuentran concentrados únicamente en el núcleo.",
+                    "No poseen masa ni carga eléctrica."
+                ],
+                correct: 0,
+                exp: "Niels Bohr propuso que los electrones orbitan en niveles de energía discretos o capas electrónicas."
+            },
+            {
+                q: "¿Cuál de estos elementos es un metal alcalino altamente reactivo con el agua?",
+                options: ["Hierro (Fe)", "Sodio (Na)", "Oxígeno (O)", "Helio (He)"],
+                correct: 1,
+                exp: "El Sodio (Na) pertenece al Grupo 1 (Metales Alcalinos) y reacciona de forma efervescente con el agua."
+            }
+        ];
+
+        let currentQuestionIdx = 0;
+        let quizScore = 0;
+
+        btnQuiz.addEventListener('click', () => {
+            currentQuestionIdx = 0;
+            quizScore = 0;
+            quizModal.classList.remove('hidden');
+            loadQuizQuestion();
+        });
+
+        closeQuizBtn.addEventListener('click', () => quizModal.classList.add('hidden'));
+
+        function loadQuizQuestion() {
+            const q = quizQuestions[currentQuestionIdx];
+            document.getElementById('quizQuestionCount').textContent = `Pregunta ${currentQuestionIdx + 1} de ${quizQuestions.length}`;
+            document.getElementById('quizScore').textContent = `Puntaje: ${quizScore}`;
+            document.getElementById('quizQuestionText').textContent = q.q;
+
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+
+            const feedback = document.getElementById('quizFeedback');
+            feedback.className = 'hidden text-xs p-2.5 rounded-lg border';
+            document.getElementById('nextQuizBtn').classList.add('hidden');
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-3 rounded-xl bg-slate-900 border border-slate-700 hover:border-amber-400 text-xs text-slate-200 transition font-medium';
+                btn.textContent = `${String.fromCharCode(65 + idx)}) ${opt}`;
+                btn.onclick = () => selectQuizAnswer(idx);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectQuizAnswer(selectedIdx) {
+            const q = quizQuestions[currentQuestionIdx];
+            const feedback = document.getElementById('quizFeedback');
+            const optionsBtns = document.querySelectorAll('#quizOptions button');
+
+            optionsBtns.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === q.correct) {
+                    btn.classList.add('bg-emerald-950/80', 'border-emerald-500', 'text-emerald-300');
+                } else if (idx === selectedIdx) {
+                    btn.classList.add('bg-red-950/80', 'border-red-500', 'text-red-300');
+                }
+            });
+
+            if (selectedIdx === q.correct) {
+                quizScore += 20;
+                feedback.className = 'text-xs p-3 rounded-xl border bg-emerald-950/50 border-emerald-500/50 text-emerald-300 block';
+                feedback.innerHTML = `<strong class="block mb-0.5"><i class="fa-solid fa-circle-check"></i> ¡Correcto!</strong> ${q.exp}`;
+            } else {
+                feedback.className = 'text-xs p-3 rounded-xl border bg-red-950/50 border-red-500/50 text-red-300 block';
+                feedback.innerHTML = `<strong class="block mb-0.5"><i class="fa-solid fa-circle-xmark"></i> Incorrecto</strong> ${q.exp}`;
+            }
+
+            document.getElementById('quizScore').textContent = `Puntaje: ${quizScore}`;
+            const nextBtn = document.getElementById('nextQuizBtn');
+            nextBtn.classList.remove('hidden');
+
+            if (currentQuestionIdx === quizQuestions.length - 1) {
+                nextBtn.innerHTML = `Finalizar Quiz <i class="fa-solid fa-trophy ml-1"></i>`;
+                nextBtn.onclick = () => {
+                    feedback.className = 'text-xs p-3 rounded-xl border bg-amber-950/50 border-amber-500/50 text-amber-300 block';
+                    feedback.innerHTML = `<strong>¡Quiz Completado!</strong> Tu resultado final es: ${quizScore} / 100 puntos.`;
+                    nextBtn.classList.add('hidden');
+                };
+            } else {
+                nextBtn.innerHTML = `Siguiente Pregunta <i class="fa-solid fa-arrow-right ml-1"></i>`;
+                nextBtn.onclick = () => {
+                    currentQuestionIdx++;
+                    loadQuizQuestion();
+                };
+            }
+        }
+
+        // INICIALIZACIÓN
+        window.addEventListener('DOMContentLoaded', () => {
+            renderPeriodicTable();
+        });
+    </script>
+</body>
+</html>
