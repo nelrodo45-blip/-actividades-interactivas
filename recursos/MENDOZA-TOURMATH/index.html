@@ -1,1 +1,1469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mendoza TourMath - Funciones y Gráficos en el Turismo</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js para visualizaciones matemáticas interactivas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2pdf.js para exportar el reporte interactivo a PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+        }
+        .title-font {
+            font-family: 'Fredoka', cursive;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .mendoza-gradient {
+            background: linear-gradient(135deg, #7b1113 0%, #a8201a 40%, #e07a5f 100%);
+        }
+        .andes-gradient {
+            background: linear-gradient(135deg, #1d3557 0%, #457b9d 100%);
+        }
+        .sun-gold {
+            background: linear-gradient(135deg, #f4a261 0%, #e9c46a 100%);
+        }
+        .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #a8201a;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(0,0,0,0.3);
+        }
+    
+        /* Integración con el Portal de Recursos */
+        .portal-resource-btn { white-space: nowrap; }
+        @media (max-width: 640px) {
+            .portal-resource-btn span { display: none; }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between">
 
+    <!-- HEADER DESTACADO CON CRÉDITO AL PROFESOR NELSON GARRO -->
+    <header class="mendoza-gradient text-white shadow-xl relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 opacity-15 text-9xl">
+            <i class="fa-solid fa-wine-glass"></i>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="text-center md:text-left">
+                    <span class="bg-amber-400 text-slate-900 font-bold px-3 py-1 rounded-full text-xs tracking-wider uppercase inline-block mb-2 shadow">
+                        <i class="fa-solid fa-graduation-cap mr-1"></i> Matemática 2° Año - Secundaria Orientada en Turismo
+                    </span>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold title-font tracking-wide text-white drop-shadow">
+                        Mendoza <span class="text-amber-300">TourMath</span>
+                    </h1>
+                    <p class="text-rose-100 text-sm sm:text-base mt-1">
+                        Modelización matemática e interpretación de gráficos lineales y no lineales en el sector turístico
+                    </p>
+                </div>
+                
+                <!-- REGISTRO DEL DISEÑADOR: PROF. NELSON GARRO -->
+
+                <div class="flex flex-wrap justify-center gap-2">
+                    <a href="https://drive.google.com/drive/folders/1L9seiE9uOQHJeH7D1n5QsQy-bdzttza-?usp=sharing" target="_blank" rel="noopener noreferrer"
+                       class="portal-resource-btn inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold text-sm shadow-lg transition"
+                       title="Recursos para Profes">
+                        <i class="fa-brands fa-google-drive"></i>
+                        <span>Recursos para Profes</span>
+                    </a>
+                    <a href="../../index.html"
+                       class="portal-resource-btn inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900/70 hover:bg-slate-800 text-white font-bold text-sm shadow-lg transition"
+                       title="Volver al Portal">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Portal</span>
+                    </a>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-md border-2 border-amber-300/80 rounded-2xl p-4 shadow-2xl text-center md:text-right flex items-center gap-3 transform hover:scale-105 transition duration-300">
+                    <div class="w-12 h-12 rounded-full bg-amber-400 text-slate-900 flex items-center justify-center font-bold text-xl shadow-lg">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-widest text-amber-200 font-semibold">Diseño Didáctico & Digital</div>
+                        <div class="text-lg font-black text-white title-font">Prof. Nelson Garro</div>
+                        <div class="text-[11px] text-amber-100">Innovación Pedagógica en Matemática</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow">
+        
+        <!-- INTRODUCCIÓN GENERAL -->
+        <div class="glass-card rounded-2xl p-6 mb-8 shadow-md border-l-8 border-amber-500 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex-1">
+                <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-compass text-amber-600"></i> ¡Bienvenidos al recorrido matemático por Mendoza!
+                </h2>
+                <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+                    Como futuros profesionales del <strong>Turismo</strong>, necesitan tomar decisiones basadas en datos: calcular costos de tours, optimizar el precio de excursiones para lograr la máxima ganancia o analizar trayectorias de aventuras outdoor. ¡Interactúa con los parámetros de las funciones y observa los cambios en los gráficos en tiempo real!
+                </p>
+            </div>
+            <div class="flex gap-2 shrink-0">
+                <span class="px-3 py-1 bg-rose-100 text-rose-800 rounded-lg text-xs font-semibold">
+                    <i class="fa-solid fa-chart-line"></i> Lineal
+                </span>
+                <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-lg text-xs font-semibold">
+                    <i class="fa-solid fa-chart-area"></i> Cuadrática
+                </span>
+                <span class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-semibold">
+                    <i class="fa-solid fa-mountain"></i> No Lineal
+                </span>
+            </div>
+        </div>
+
+        <!-- NAVEGACIÓN POR MÓDULOS -->
+        <div class="flex flex-wrap gap-2 mb-6 border-b border-slate-200 pb-2">
+            <button onclick="switchTab('modulo1')" id="btn-modulo1" class="tab-btn px-5 py-3 rounded-xl font-bold text-sm transition flex items-center gap-2 bg-slate-900 text-white shadow-md">
+                <i class="fa-solid fa-wine-glass"></i> 1. Bodegas (Lineal)
+            </button>
+            <button onclick="switchTab('modulo2')" id="btn-modulo2" class="tab-btn px-5 py-3 rounded-xl font-bold text-sm transition flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-100">
+                <i class="fa-solid fa-person-hiking"></i> 2. Tirolina Canopy (Cuadrática)
+            </button>
+            <button onclick="switchTab('modulo3')" id="btn-modulo3" class="tab-btn px-5 py-3 rounded-xl font-bold text-sm transition flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-100">
+                <i class="fa-solid fa-bus-simple"></i> 3. Bus Turístico (Ganancia Máxima)
+            </button>
+            <button onclick="switchTab('modulo4')" id="btn-modulo4" class="tab-btn px-5 py-3 rounded-xl font-bold text-sm transition flex items-center gap-2 bg-white text-slate-600 hover:bg-slate-100">
+                <i class="fa-solid fa-temperature-arrow-down"></i> 4. Clima Aconcagua (No Lineal)
+            </button>
+            <button onclick="switchTab('desafío')" id="btn-desafío" class="tab-btn px-5 py-3 rounded-xl font-bold text-sm transition flex items-center gap-2 bg-amber-500 text-slate-900 hover:bg-amber-400">
+                <i class="fa-solid fa-trophy"></i> Desafío Evaluativo
+            </button>
+        </div>
+
+        <!-- MÓDULO 1: FUNCIÓN LINEAL - COSTO DE EXCURSIÓN A BODEGAS -->
+        <div id="modulo1" class="tab-content block">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Panel de Controles -->
+                <div class="lg:col-span-5 glass-card rounded-2xl p-6 shadow-lg border border-slate-200">
+                    <div class="flex items-center justify-between border-b pb-3 mb-4">
+                        <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-rose-600"></i> Parámetros de la Excursión
+                        </h3>
+                        <span class="text-xs bg-rose-100 text-rose-800 font-bold px-2 py-1 rounded">f(x) = m·x + b</span>
+                    </div>
+
+                    <p class="text-xs text-slate-600 mb-4">
+                        Una agencia de viajes en Mendoza organiza un "Wine Tour" por Luján de Cuyo. Calcula el costo total <strong>y (Costo total en USD)</strong> según la cantidad de turistas <strong>x</strong>.
+                    </p>
+
+                    <!-- Control: Pendiente (m) -->
+                    <div class="mb-5 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-sm font-bold text-slate-700">Costo por Pasajero (Pendiente 'm'):</label>
+                            <span id="val-m" class="font-bold text-rose-600 text-lg">$30 USD</span>
+                        </div>
+                        <input type="range" id="slider-m" min="10" max="80" step="5" value="30" class="w-full custom-slider cursor-pointer" oninput="updateLinearModel()">
+                        <span class="text-[11px] text-slate-500">Representa la pendiente de la recta: cambio de costo por cada turista extra.</span>
+                    </div>
+
+                    <!-- Control: Ordenada al Origen (b) -->
+                    <div class="mb-5 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-sm font-bold text-slate-700">Costo Fijo de Transporte/Guía (Ordenada 'b'):</label>
+                            <span id="val-b" class="font-bold text-rose-600 text-lg">$200 USD</span>
+                        </div>
+                        <input type="range" id="slider-b" min="50" max="500" step="25" value="200" class="w-full custom-slider cursor-pointer" oninput="updateLinearModel()">
+                        <span class="text-[11px] text-slate-500">Representa la ordenada al origen: costo base aunque viajen 0 pasajeros.</span>
+                    </div>
+
+                    <!-- Fórmula Dinámica y Editable -->
+                    <div class="bg-slate-900 text-white p-4 rounded-xl text-center shadow-inner mb-6 border border-rose-500/30">
+                        <div class="text-xs text-amber-400 font-semibold mb-2 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-pen-to-square"></i> Fórmula Editable (Haz clic en los números para cambiar la función)
+                        </div>
+                        <div class="text-xl sm:text-2xl font-black tracking-wider text-rose-400 flex items-center justify-center gap-1 flex-wrap">
+                            <span>C(x) =</span>
+                            <input type="number" id="input-m" value="30" step="5" class="w-20 text-center bg-slate-800 text-amber-300 border-2 border-amber-400/60 rounded-lg px-2 py-1 focus:outline-none focus:border-amber-300 font-extrabold text-xl shadow-inner transition hover:bg-slate-700" oninput="syncFromInputLinear()" title="Editar Pendiente (m)">
+                            <span>· x +</span>
+                            <input type="number" id="input-b" value="200" step="25" class="w-24 text-center bg-slate-800 text-amber-300 border-2 border-amber-400/60 rounded-lg px-2 py-1 focus:outline-none focus:border-amber-300 font-extrabold text-xl shadow-inner transition hover:bg-slate-700" oninput="syncFromInputLinear()" title="Editar Ordenada al Origen (b)">
+                        </div>
+                    </div>
+
+                    <!-- Preguntas Interactivas -->
+                    <div class="space-y-3">
+                        <h4 class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-question text-amber-500"></i> Análisis Didáctico:
+                        </h4>
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900">
+                            <strong>1. Intersección con el eje Y:</strong> ¿Qué significa en la práctica que la recta corte al eje vertical en <span id="text-b-meaning">$200</span>?
+                            <p class="mt-1 text-slate-700">Respuesta: Es el costo fijo del servicio (chofer, vehículo, seguro) sin importar la cantidad de personas.</p>
+                        </div>
+                        <div class="bg-rose-50 border border-rose-200 rounded-xl p-3 text-xs text-rose-900">
+                            <strong>2. Crecimiento:</strong> Si se suman 10 pasajeros adicionales, el costo total aumenta exactamente en <span id="text-m-step">$300 USD</span>.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualización del Gráfico -->
+                <div class="lg:col-span-7 glass-card rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+                                <i class="fa-solid fa-chart-line text-rose-600"></i> Gráfico de Variación Costo vs. Pasajeros
+                            </h3>
+                            <span class="text-xs text-slate-500">Variable x: Cantidad de Turistas | Variable y: Costo ($)</span>
+                        </div>
+                        <div class="relative h-[320px] w-full">
+                            <canvas id="linearChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Valores Generada -->
+                    <div class="mt-6 border-t pt-4">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tabla de Valores de la Excursión</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-center border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-700">
+                                        <th class="p-2 border">Pasajeros (x)</th>
+                                        <th class="p-2 border">0</th>
+                                        <th class="p-2 border">5</th>
+                                        <th class="p-2 border">10</th>
+                                        <th class="p-2 border">15</th>
+                                        <th class="p-2 border">20</th>
+                                        <th class="p-2 border">25</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="linear-table-row" class="font-bold text-rose-700">
+                                        <td class="p-2 border bg-slate-50 text-slate-800">Costo Total ($)</td>
+                                        <!-- JS inserta valores -->
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MÓDULO 2: FUNCIÓN CUADRÁTICA - TRAYECTORIA DE TIROLINA EN POTRERILLOS -->
+        <div id="modulo2" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Panel de Controles -->
+                <div class="lg:col-span-5 glass-card rounded-2xl p-6 shadow-lg border border-slate-200">
+                    <div class="flex items-center justify-between border-b pb-3 mb-4">
+                        <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-mountain-sun text-indigo-600"></i> Parámetros de la Parábola
+                        </h3>
+                        <span class="text-xs bg-indigo-100 text-indigo-800 font-bold px-2 py-1 rounded">f(x) = a·x² + b·x + c</span>
+                    </div>
+
+                    <p class="text-xs text-slate-600 mb-4">
+                        En Potrerillos, un cable de tirolina describe una curva parabólica debido a la gravedad y tensión. Modifica los coeficientes para interpretar el comportamiento del cable.
+                    </p>
+
+                    <!-- Slider: Concavidad (a) -->
+                    <div class="mb-4 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-bold text-slate-700">Curvatura/Tensión ('a'):</label>
+                            <span id="val-quad-a" class="font-bold text-indigo-600 text-sm">0.02</span>
+                        </div>
+                        <input type="range" id="slider-quad-a" min="0.005" max="0.05" step="0.005" value="0.02" class="w-full custom-slider cursor-pointer" oninput="updateQuadraticModel()">
+                        <span class="text-[10px] text-slate-500">Como a > 0, la parábola abre hacia arriba (tirolina con guata/curva).</span>
+                    </div>
+
+                    <!-- Slider: Posición horizontal del punto bajo -->
+                    <div class="mb-4 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-bold text-slate-700">Desplazamiento Horizontal (b):</label>
+                            <span id="val-quad-b" class="font-bold text-indigo-600 text-sm">-1.2</span>
+                        </div>
+                        <input type="range" id="slider-quad-b" min="-2.5" max="-0.2" step="0.1" value="-1.2" class="w-full custom-slider cursor-pointer" oninput="updateQuadraticModel()">
+                        <span class="text-[10px] text-slate-500">Determina dónde ocurre el punto de menor altura (vértice).</span>
+                    </div>
+
+                    <!-- Slider: Altura Inicial (c) -->
+                    <div class="mb-4 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-bold text-slate-700">Altura Plataforma Salida ('c'):</label>
+                            <span id="val-quad-c" class="font-bold text-indigo-600 text-sm">30 m</span>
+                        </div>
+                        <input type="range" id="slider-quad-c" min="15" max="50" step="1" value="30" class="w-full custom-slider cursor-pointer" oninput="updateQuadraticModel()">
+                        <span class="text-[10px] text-slate-500">Altura de la torre de salida respecto al suelo (Ordenada al origen).</span>
+                    </div>
+
+                    <!-- Fórmula Dinámica y Editable -->
+                    <div class="bg-slate-900 text-white p-3 rounded-xl text-center shadow-inner mb-4 border border-indigo-500/30">
+                        <div class="text-[11px] text-amber-400 font-semibold mb-2 flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-pen-to-square"></i> Ecuación de Altura h(x) Editable
+                        </div>
+                        <div class="text-base sm:text-lg font-black tracking-wider text-indigo-300 flex items-center justify-center gap-1 flex-wrap">
+                            <span>h(x) =</span>
+                            <input type="number" id="input-quad-a" value="0.02" step="0.005" class="w-20 text-center bg-slate-800 text-amber-300 border-2 border-amber-400/60 rounded-lg px-1 py-0.5 focus:outline-none focus:border-amber-300 font-bold text-sm shadow-inner transition hover:bg-slate-700" oninput="syncFromInputQuad()" title="Editar Coeficiente Cuadrático (a)">
+                            <span>·x² +</span>
+                            <input type="number" id="input-quad-b" value="-1.2" step="0.1" class="w-20 text-center bg-slate-800 text-amber-300 border-2 border-amber-400/60 rounded-lg px-1 py-0.5 focus:outline-none focus:border-amber-300 font-bold text-sm shadow-inner transition hover:bg-slate-700" oninput="syncFromInputQuad()" title="Editar Coeficiente Lineal (b)">
+                            <span>·x +</span>
+                            <input type="number" id="input-quad-c" value="30" step="1" class="w-16 text-center bg-slate-800 text-amber-300 border-2 border-amber-400/60 rounded-lg px-1 py-0.5 focus:outline-none focus:border-amber-300 font-bold text-sm shadow-inner transition hover:bg-slate-700" oninput="syncFromInputQuad()" title="Editar Término Independiente (c)">
+                        </div>
+                    </div>
+
+                    <!-- Interpretación de Puntos Clave -->
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3 text-xs space-y-1">
+                        <div class="font-bold text-indigo-900 flex items-center gap-1">
+                            <i class="fa-solid fa-location-crosshairs text-indigo-600"></i> Elementos Clave del Gráfico:
+                        </div>
+                        <div>• <strong>Vértice (Punto más bajo):</strong> <span id="quad-vertex" class="font-bold text-indigo-700">(30m, 12m)</span></div>
+                        <div>• <strong>Altura Mínima:</strong> El turista llega a estar a <span id="quad-min-h" class="font-bold text-indigo-700">12 metros</span> del suelo.</div>
+                    </div>
+                </div>
+
+                <!-- Visualización del Gráfico -->
+                <div class="lg:col-span-7 glass-card rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+                                <i class="fa-solid fa-chart-area text-indigo-600"></i> Altura del Turista durante el Recorrido
+                            </h3>
+                            <span class="text-xs text-slate-500">x: Distancia Horizontal (m) | y: Altura (m)</span>
+                        </div>
+                        <div class="relative h-[330px] w-full">
+                            <canvas id="quadChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 flex items-start gap-2">
+                        <i class="fa-solid fa-lightbulb text-amber-600 text-base mt-0.5"></i>
+                        <div>
+                            <strong>Reflexión Turística:</strong> Por motivos de seguridad y velocidad de frenado en el Canopy, la pendiente y la altura mínima en el vértice deben ser calculadas de forma precisa para evitar accidentes al llegar a la plataforma final.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MÓDULO 3: FUNCIÓN CUADRÁTICA - OPTIMIZACIÓN DE INGRESOS (BUS TURÍSTICO) -->
+        <div id="modulo3" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Controles del problema -->
+                <div class="lg:col-span-5 glass-card rounded-2xl p-6 shadow-lg border border-slate-200">
+                    <div class="flex items-center justify-between border-b pb-3 mb-4">
+                        <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-sack-dollar text-emerald-600"></i> Maximización de Ingresos
+                        </h3>
+                        <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-1 rounded">I(p) = -a·p² + b·p</span>
+                    </div>
+
+                    <p class="text-xs text-slate-600 mb-4">
+                        El "City Hop-On Hop-Off" de Mendoza analiza cómo varía el <strong>Ingreso Diario Total ($)</strong> en función del <strong>Precio del Boleto (p)</strong>.
+                        Si el precio es muy bajo, no recauda suficiente; si es muy alto, viajan pocos pasajeros.
+                    </p>
+
+                    <!-- Slider: Precio del Boleto -->
+                    <div class="mb-5 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-sm font-bold text-slate-700">Precio Actual Evaluado (p):</label>
+                            <span id="val-price" class="font-bold text-emerald-600 text-xl">$15 USD</span>
+                        </div>
+                        <input type="range" id="slider-price" min="0" max="40" step="1" value="15" class="w-full custom-slider cursor-pointer" oninput="updateProfitModel()">
+                        <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                            <span>$0 USD</span>
+                            <span>$20 USD (Óptimo)</span>
+                            <span>$40 USD</span>
+                        </div>
+                    </div>
+
+                    <!-- Fórmula Dinámica y Editable para Optimización de Ingresos -->
+                    <div class="bg-slate-900 text-white p-3 rounded-xl text-center shadow-inner mb-4 border border-emerald-500/30">
+                        <div class="text-[11px] text-amber-400 font-semibold mb-2 flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-pen-to-square"></i> Función de Ingreso Editable (Forma Canonica)
+                        </div>
+                        <div class="text-xs sm:text-sm font-black tracking-wider text-emerald-300 flex items-center justify-center gap-1 flex-wrap">
+                            <span>I(p) = -</span>
+                            <input type="number" id="input-prof-a" value="10" step="1" min="1" max="50" class="w-14 text-center bg-slate-800 text-amber-300 border-2 border-amber-400/60 rounded-lg px-1 py-0.5 focus:outline-none focus:border-amber-300 font-bold text-xs shadow-inner" oninput="syncFromInputProfit()" title="Editar Factor de Apertura (a)">
+                            <span>· (p -</span>
+                            <input type="number" id="input-prof-xv" value="20" step="1" min="5" max="35" class="w-14 text-center bg-slate-800 text-amber-300 border-2 border-amber-400/60 rounded-lg px-1 py-0.5 focus:outline-none focus:border-amber-300 font-bold text-xs shadow-inner" oninput="syncFromInputProfit()" title="Editar Precio Óptimo Xv">
+                            <span>)² +</span>
+                            <input type="number" id="input-prof-yv" value="4000" step="250" min="500" max="10000" class="w-20 text-center bg-slate-800 text-amber-300 border-2 border-amber-400/60 rounded-lg px-1 py-0.5 focus:outline-none focus:border-amber-300 font-bold text-xs shadow-inner" oninput="syncFromInputProfit()" title="Editar Ingreso Máximo Yv">
+                        </div>
+                    </div>
+
+                    <!-- Estado Actual Calculado -->
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-center">
+                            <span class="text-[10px] text-emerald-700 font-semibold block">Pasajeros Estimados</span>
+                            <span id="stat-passengers" class="text-xl font-black text-emerald-800">250 pax</span>
+                        </div>
+                        <div class="bg-emerald-600 text-white p-3 rounded-xl text-center shadow">
+                            <span class="text-[10px] text-emerald-100 font-semibold block">Ingreso Total Resultante</span>
+                            <span id="stat-revenue" class="text-xl font-black">$3,750 USD</span>
+                        </div>
+                    </div>
+
+                    <!-- Análisis del Vértice y Raíces -->
+                    <div class="bg-slate-900 text-white p-4 rounded-xl space-y-2 text-xs">
+                        <div class="text-amber-400 font-bold flex items-center gap-1 border-b border-slate-700 pb-1">
+                            <i class="fa-solid fa-bullseye"></i> Análisis de Elementos Cuadráticos:
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-300">Raíces (Ingreso zero):</span>
+                            <span class="font-bold text-rose-400">p = $0 y p = $40 USD</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-300">Precio Óptimo (Xv):</span>
+                            <span class="font-bold text-amber-300">p = $20 USD</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-300">Ingreso Máximo (Yv):</span>
+                            <span class="font-bold text-emerald-400">$4,000 USD</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico Parábola de Ganancia -->
+                <div class="lg:col-span-7 glass-card rounded-2xl p-6 shadow-lg border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+                                <i class="fa-solid fa-chart-column text-emerald-600"></i> Curva de Rendimiento de la Empresa Turística
+                            </h3>
+                            <span class="text-xs text-slate-500">Parábola invertida (a < 0 con Máximo)</span>
+                        </div>
+                        <div class="relative h-[320px] w-full">
+                            <canvas id="profitChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-4 bg-slate-100 rounded-xl text-xs text-slate-700 border border-slate-200">
+                        <strong class="text-slate-900"><i class="fa-solid fa-graduation-cap text-indigo-600"></i> Concepto Clave de Secundaria:</strong> 
+                        Cuando el coeficiente principal es negativo ($a < 0$), la rama de la parábola mira hacia abajo. El <strong>Vértice $V(h, k)$</strong> representa el punto máximo de la función: en este caso, la tarifa que maximiza el ingreso económico del recorrido turístico.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MÓDULO 4: FUNCIÓN NO LINEAL - TEMPERATURA EN EL ACONCAGUA -->
+        <div id="modulo4" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <div class="lg:col-span-5 glass-card rounded-2xl p-6 shadow-lg border border-slate-200">
+                    <div class="flex items-center justify-between border-b pb-3 mb-4">
+                        <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-snowflake text-sky-600"></i> Perfil Térmico de Montaña
+                        </h3>
+                        <span class="text-xs bg-sky-100 text-sky-800 font-bold px-2 py-1 rounded">No Lineal / Oscilante</span>
+                    </div>
+
+                    <p class="text-xs text-slate-600 mb-4">
+                        Para las excursiones de trekking en el Parque Provincial Aconcagua (Horcones - Plaza de Mulas), la temperatura no cambia de forma constante en una línea recta. Presenta variaciones según la hora del día y la radiación solar.
+                    </p>
+
+                    <!-- Selector de Estación del Año -->
+                    <div class="mb-5 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <label class="text-xs font-bold text-slate-700 block mb-2">Selecciona la Temporada Turística:</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setSeason('verano')" id="btn-verano" class="px-3 py-2 rounded-lg font-bold text-xs bg-sky-600 text-white shadow">
+                                <i class="fa-solid fa-sun text-amber-300"></i> Verano (Alta)
+                            </button>
+                            <button onclick="setSeason('invierno')" id="btn-invierno" class="px-3 py-2 rounded-lg font-bold text-xs bg-white text-slate-700 border hover:bg-slate-100">
+                                <i class="fa-solid fa-snowflake text-sky-500"></i> Invierno (Baja)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Datos destacados del análisis -->
+                    <div class="space-y-3">
+                        <div class="p-3 bg-sky-50 border border-sky-200 rounded-xl text-xs text-sky-900">
+                            <strong><i class="fa-solid fa-temperature-high text-rose-500"></i> Temperatura Máxima:</strong> Ocurre alrededor de las 14:00 hs debido a la radiación solar en la cordillera.
+                        </div>
+                        <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-900">
+                            <strong><i class="fa-solid fa-temperature-low text-sky-600"></i> Temperatura Mínima:</strong> Registrada durante la madrugada (05:00 hs).
+                        </div>
+                        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900">
+                            <strong><i class="fa-solid fa-shirt"></i> Recomendación Turística:</strong> Permite planificar el vestuario "tipo cebolla" (por capas) indispensable para llevar a los clientes.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Variación No Lineal -->
+                <div class="lg:col-span-7 glass-card rounded-2xl p-6 shadow-lg border border-slate-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-sky-600"></i> Gráfico de Variación Térmica Diaria (0 a 24 hs)
+                        </h3>
+                        <span class="text-xs text-slate-500">Curva No Lineal Continuada</span>
+                    </div>
+                    <div class="relative h-[330px] w-full">
+                        <canvas id="climateChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MÓDULO 5: DESAFÍO EVALUATIVO INTERACTIVO -->
+        <div id="desafío" class="tab-content hidden">
+            <div class="glass-card rounded-2xl p-6 shadow-xl border border-amber-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 mb-6 gap-4">
+                    <div>
+                        <h3 class="text-2xl font-black text-slate-900 title-font flex items-center gap-2">
+                            <i class="fa-solid fa-award text-amber-500"></i> Desafío Evaluativo de Interpretación
+                        </h3>
+                        <p class="text-xs text-slate-600 mt-1">
+                            Responde las 5 preguntas aleatorias asignadas para evaluar tus competencias en funciones aplicadas al turismo.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="bg-slate-100 border border-slate-300 px-4 py-2 rounded-xl text-center">
+                            <span class="text-[10px] text-slate-500 font-bold block uppercase tracking-wider">Puntuación</span>
+                            <span id="quiz-score-num" class="text-2xl font-black text-slate-800">0 / 10</span>
+                        </div>
+                        <div id="status-badge" class="px-4 py-2 rounded-xl text-center bg-slate-200 text-slate-600 font-bold text-sm">
+                            Sin Evaluar
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REGISTRO DEL ESTUDIANTE -->
+                <div class="bg-amber-50 border-2 border-amber-300/80 p-4 rounded-2xl mb-6 flex flex-col sm:flex-row items-center gap-4 shadow-sm">
+                    <div class="w-10 h-10 rounded-full bg-amber-400 text-slate-900 flex items-center justify-center font-bold shrink-0">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <div class="w-full">
+                        <label for="student-name" class="block text-xs font-bold text-amber-900 uppercase tracking-wider mb-1">
+                            Nombre y Apellido del Alumno/a: <span class="text-rose-600">*</span>
+                        </label>
+                        <input type="text" id="student-name" placeholder="Ej: Maria Gonzalez" class="w-full bg-white border border-amber-300 rounded-xl px-4 py-2 text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm">
+                    </div>
+                    <button onclick="generateRandomQuiz()" class="w-full sm:w-auto px-4 py-2.5 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-700 transition shrink-0 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-shuffle"></i> Cambiar Preguntas
+                    </button>
+                </div>
+
+                <!-- CONTENEDOR DINÁMICO DE 5 PREGUNTAS ALEATORIAS -->
+                <div id="quiz-questions-container" class="space-y-6">
+                    <!-- JavaScript inyecta 5 preguntas del banco de 20 -->
+                </div>
+
+                <!-- PANEL DE RESULTADOS Y GENERACIÓN DE ENTREGA -->
+                <div id="quiz-results" class="mt-8 border-t pt-6 hidden">
+                    <div id="results-card" class="p-5 rounded-2xl border mb-6 text-center">
+                        <h4 id="results-title" class="text-xl font-black mb-1 title-font"></h4>
+                        <p id="results-detail" class="text-sm font-medium mb-3"></p>
+                        <div id="results-status-box" class="inline-block px-6 py-2 rounded-full font-black text-lg tracking-wide uppercase shadow"></div>
+                    </div>
+
+                    <!-- OPCIONES DE ENTREGA AL PROFESOR: PDF, ARCHIVO DE TEXTO Y WHATSAPP -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+                        <button onclick="downloadPDF()" class="w-full px-4 py-3.5 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-500 shadow-lg transition flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-file-pdf text-lg"></i> Descargar Reporte PDF
+                        </button>
+                        <button onclick="downloadTXT()" class="w-full px-4 py-3.5 bg-sky-600 text-white rounded-xl font-bold hover:bg-sky-500 shadow-lg transition flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-file-lines text-lg"></i> Archivo de Texto (.TXT)
+                        </button>
+                        <button onclick="copyTextReport()" class="w-full px-4 py-3.5 bg-amber-500 text-slate-900 rounded-xl font-bold hover:bg-amber-400 shadow-lg transition flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-copy text-lg"></i> Copiar Texto (WhatsApp)
+                        </button>
+                    </div>
+                    <div id="copy-toast" class="hidden mt-3 p-3 bg-slate-800 text-amber-300 text-xs text-center rounded-xl font-bold transition">
+                        <i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> ¡Resumen copiado al portapapeles! Listo para enviar por WhatsApp, email o Classroom al Prof. Nelson Garro.
+                    </div>
+                </div>
+
+                <!-- BOTÓN PRINCIPAL EVALUAR -->
+                <div id="quiz-action-bar" class="flex justify-end gap-3 mt-6">
+                    <button onclick="checkQuiz()" class="px-6 py-3 bg-amber-500 text-slate-900 rounded-xl font-bold hover:bg-amber-400 shadow-lg transition flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-base"></i> Autocorregir Todo y Finalizar Evaluación
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+
+    <!-- MATERIALES PARA PROFES -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 w-full">
+        <div class="bg-white rounded-2xl shadow-lg border-l-8 border-amber-500 p-5 sm:p-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-5">
+                <div>
+                    <h2 class="text-xl font-extrabold text-slate-900">
+                        <i class="fa-solid fa-folder-open text-amber-500 mr-2"></i>
+                        MATERIALES PARA PROFES
+                    </h2>
+                    <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                        En esta carpeta de Google Drive se publicarán los archivos descargables,
+                        versiones del recurso y materiales complementarios de Mendoza TourMath.
+                    </p>
+                </div>
+                <a href="https://drive.google.com/drive/folders/1L9seiE9uOQHJeH7D1n5QsQy-bdzttza-?usp=sharing" target="_blank" rel="noopener noreferrer"
+                   class="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-900 font-extrabold shadow-lg transition">
+                    <i class="fa-brands fa-google-drive text-lg"></i>
+                    Abrir carpeta de recursos
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER CON RECONOCIMIENTO DESTACADO -->
+    <footer class="bg-slate-900 text-slate-400 py-8 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="inline-flex items-center justify-center space-x-2 bg-slate-800 px-4 py-2 rounded-full border border-amber-500/30 mb-4">
+                <i class="fa-solid fa-pen-ruler text-amber-400"></i>
+                <span class="text-xs text-amber-200">Diseñado y Desarrollado Didácticamente por el <strong>Prof. Nelson Garro</strong></span>
+            </div>
+            <p class="text-xs text-slate-500 max-w-xl mx-auto">
+                Recurso educativo digital interactivo diseñado para la enseñanza de la Matemática aplicada al Turismo en Escuelas Orientadas de la Provincia de Mendoza.
+            </p>
+            <p class="text-[10px] text-slate-600 mt-2">© 2026 Mendoza TourMath - Aprendizaje Basado en Problemas Turísticos Realistas.</p>
+        </div>
+    </footer>
+
+    <!-- LOGICA JAVASCRIPT -->
+    <script>
+        // Variables Globales de Gráficos
+        let linearChart, quadChart, profitChart, climateChart;
+
+        // BANCO DE 20 PREGUNTAS CONTEXTUALIZADAS EN MENDOZA Y TURISMO
+        const questionBank = [
+            {
+                id: 1,
+                question: "En la función lineal de costo del tour a bodegas C(x) = 30·x + 200, ¿qué representa el término independiente 200?",
+                options: [
+                    "El precio individual que abona cada turista por la entrada.",
+                    "La ordenada al origen: el costo fijo de transporte y guía independientemente del número de pasajeros.",
+                    "La cantidad máxima de pasajeros permitidos en el colectivo de turismo."
+                ],
+                correct: 1,
+                explanation: "La ordenada al origen (b=200) representa el costo base fijo del transporte y chofer antes de sumar personas."
+            },
+            {
+                id: 2,
+                question: "Si la pendiente 'm' en C(x) = m·x + b aumenta de $30 a $50 USD, ¿qué significado económico representa?",
+                options: [
+                    "El alquiler del vehículo completo se hizo más barato.",
+                    "Aumentó el costo individual por cada pasajero que se suma a la excursión.",
+                    "El tour ahora es gratuito para residentes de Mendoza."
+                ],
+                correct: 1,
+                explanation: "La pendiente m mide la razón de cambio; si m sube, cada turista adicional incrementa más el costo total."
+            },
+            {
+                id: 3,
+                question: "En la función de ganancia del Bus Turístico I(p) = -10(p - 20)² + 4000, ¿cuál es el precio óptimo 'p' del boleto?",
+                options: [
+                    "p = $20 USD, donde se logra el vértice y la máxima recaudación.",
+                    "p = $40 USD, donde el pasaje es más caro.",
+                    "p = $0 USD, para que viajen gratis."
+                ],
+                correct: 0,
+                explanation: "El vértice de la parábola se encuentra en p = 20, valor en el cual la ganancia se maximiza."
+            },
+            {
+                id: 4,
+                question: "En el modelo I(p) = -10(p - 20)² + 4000 del Bus Turístico, ¿cuál es el ingreso máximo alcanzable?",
+                options: [
+                    "$2,000 USD",
+                    "$4,000 USD",
+                    "$10,000 USD"
+                ],
+                correct: 1,
+                explanation: "La coordenada 'k' del vértice V(20, 4000) indica que la mayor recaudación posible es $4000 USD."
+            },
+            {
+                id: 5,
+                question: "En la tirolina de Potrerillos h(x) = 0.02·x² - 1.2·x + 30, ¿qué elemento matemático señala la menor altura del turista?",
+                options: [
+                    "Las raíces de la parábola.",
+                    "El Vértice V(x_v, y_v) de la función cuadrática.",
+                    "El eje de las ordenadas en x = 60."
+                ],
+                correct: 1,
+                explanation: "Como a > 0, la parábola abre hacia arriba y su vértice marca la altura mínima del cable respecto al suelo."
+            },
+            {
+                id: 6,
+                question: "En la tirolina h(x) = 0.02·x² - 1.2·x + 30, ¿cuál es la altura de la torre de salida?",
+                options: [
+                    "30 metros (la ordenada al origen cuando la distancia recorrida x es 0).",
+                    "1.2 metros.",
+                    "60 metros."
+                ],
+                correct: 0,
+                explanation: "En el inicio de la plataforma (x = 0), la altura h(0) = c = 30 metros."
+            },
+            {
+                id: 7,
+                question: "Al analizar el costo de una excursión según la cantidad de personas, ¿cuál es la variable independiente 'x'?",
+                options: [
+                    "El costo total a pagar en pesos o dólares.",
+                    "La cantidad de turistas o pasajeros que integran el grupo.",
+                    "La distancia en kilómetros recorrida hacia la bodega."
+                ],
+                correct: 1,
+                explanation: "La cantidad de turistas 'x' es la variable independiente sobre la cual se calcula el costo total 'y'."
+            },
+            {
+                id: 8,
+                question: "La variación de la temperatura en el Aconcagua a lo largo de las 24 horas del día es una función no lineal porque:",
+                options: [
+                    "Crece y decrece a tasas variables debido a la salida y puesta del sol.",
+                    "Aumenta en una línea recta perfecta de 0°C a 100°C.",
+                    "Es siempre constante a cualquier hora del día."
+                ],
+                correct: 0,
+                explanation: "El clima diario oscila con curvas térmicas no constantes, alcanzando máximos al mediodía y mínimos al amanecer."
+            },
+            {
+                id: 9,
+                question: "Si el precio del Bus Turístico se fija en $0 USD o en $40 USD, el ingreso resulta de $0 USD. En matemática estos puntos se denominan:",
+                options: [
+                    "Raíces o ceros de la función cuadrática.",
+                    "Pendiente máxima de la recta.",
+                    "Asíntotas verticales."
+                ],
+                correct: 0,
+                explanation: "Las raíces o intersecciones con el eje X representan los valores del boleto donde la función de ingreso vale 0."
+            },
+            {
+                id: 10,
+                question: "Si una agencia ofrece alquiler de van con chofer por $500 USD fijos sin importar cuántos pasajeros viajen, el gráfico representa:",
+                options: [
+                    "Una función constante (línea recta horizontal).",
+                    "Una parábola que abre hacia abajo.",
+                    "Una función exponencial decreciente."
+                ],
+                correct: 0,
+                explanation: "Al no cambiar el valor según la cantidad de pasajeros, f(x) = 500 es una función constante paralela al eje X."
+            },
+            {
+                id: 11,
+                question: "En la función cuadrática f(x) = a·x² + b·x + c, si el coeficiente 'a' es negativo (a < 0), la curva parabólica:",
+                options: [
+                    "Abre sus ramas hacia arriba y posee un punto Mínimo.",
+                    "Abre sus ramas hacia abajo y posee un punto Máximo en el Vértice.",
+                    "Se convierte en una recta inclinada hacia la derecha."
+                ],
+                correct: 1,
+                explanation: "Cuando a < 0, la concavidad es hacia abajo, lo que genera una cúspide o valor máximo en el vértice."
+            },
+            {
+                id: 12,
+                question: "Un colectivo viaja desde la Ciudad de Mendoza hacia Uspallata a velocidad constante. El gráfico Distancia vs Tiempo es:",
+                options: [
+                    "Una función lineal creciente de la forma d(t) = v·t.",
+                    "Una parábola de segundo grado.",
+                    "Una curva sinusoidal."
+                ],
+                correct: 0,
+                explanation: "A velocidad constante, la distancia recorrida es directamente proporcional al tiempo (modelo lineal)."
+            },
+            {
+                id: 13,
+                question: "El Vértice V(h, k) en la función de la tirolina indica que a los 'h' metros de recorrido horizontal se alcanza:",
+                options: [
+                    "La altura mínima 'k' respecto al piso.",
+                    "El fin de la excursión turística.",
+                    "La velocidad cero del cable."
+                ],
+                correct: 0,
+                explanation: "En la forma canónica, 'h' es la coordenada X del vértice y 'k' es la altura mínima Y alcanzada."
+            },
+            {
+                id: 14,
+                question: "En la función de costo f(x) = 25·x + 100, si asisten 4 turistas (x = 4), ¿cuál es el costo total resultante?",
+                options: [
+                    "$200 USD",
+                    "$125 USD",
+                    "$400 USD"
+                ],
+                correct: 0,
+                explanation: "Sustituyendo x = 4: f(4) = 25·(4) + 100 = 100 + 100 = $200 USD."
+            },
+            {
+                id: 15,
+                question: "La temperatura máxima del Aconcagua registrada a las 14:00 hs representa en el gráfico no lineal:",
+                options: [
+                    "Un Máximo Relativo de la curva térmica.",
+                    "La ordenada al origen de la temperatura.",
+                    "La pendiente constante de la noche."
+                ],
+                correct: 0,
+                explanation: "El pico más alto alcanzado durante las horas de radiación solar es un máximo de la función continua."
+            },
+            {
+                id: 16,
+                question: "En el contexto real de un tour en Mendoza, ¿cuál es el dominio realista para la cantidad de pasajeros 'x'?",
+                options: [
+                    "Números enteros no negativos (x ≥ 0) hasta la capacidad máxima del vehículo.",
+                    "Todos los números reales negativos de -∞ a 0.",
+                    "Únicamente números racionales fraccionarios como 3.75 personas."
+                ],
+                correct: 0,
+                explanation: "No se pueden trasladar fracciones de personas ni pasajeros negativos; el dominio es discreto y entero no negativo."
+            },
+            {
+                id: 17,
+                question: "En la función f(x) = a·x² + b·x + c con a > 0, si aumentamos la tensión del cable en Potrerillos haciéndolo más tenso:",
+                options: [
+                    "El coeficiente 'a' disminuye, haciendo la parábola más plana y reduciendo la guata.",
+                    "La gráfica se vuelve vertical.",
+                    "El valor de 'c' se vuelve negativo."
+                ],
+                correct: 0,
+                explanation: "Un coeficiente 'a' más pequeño genera una parábola más abierta y suave, imitando un cable más tenso."
+            },
+            {
+                id: 18,
+                question: "Para calcular la pendiente 'm' de una función de costo lineal conocidos dos puntos P1(5, 350) y P2(10, 500), se usa:",
+                options: [
+                    "m = (y2 - y1) / (x2 - x1) = (500 - 350) / (10 - 5) = 150 / 5 = 30.",
+                    "m = 500 + 350 + 10 + 5.",
+                    "m = 500 · 10."
+                ],
+                correct: 0,
+                explanation: "La razón de cambio o pendiente es el cociente entre el incremento en Y y el incremento en X."
+            },
+            {
+                id: 19,
+                question: "En la maximización de ingresos del Bus Turístico, si aumentamos el boleto por encima del precio óptimo de $20 USD:",
+                options: [
+                    "El ingreso disminuye porque la baja en la cantidad de pasajeros supera el mayor precio del boleto.",
+                    "La ganancia crece indefinidamente hasta el infinito.",
+                    "El colectivo se llena con el doble de turistas."
+                ],
+                correct: 0,
+                explanation: "Pasado el precio óptimo del vértice, la demanda cae marcadamente reduciendo la recaudación total."
+            },
+            {
+                id: 20,
+                question: "En cualquier gráfico cartesiano de funciones turísticas, la variable dependiente 'y' siempre se representa en:",
+                options: [
+                    "El eje vertical o eje de las ordenadas.",
+                    "El eje horizontal o eje de las abscisas.",
+                    "El centro u origen del plano cartesiano."
+                ],
+                correct: 0,
+                explanation: "Por convención matemática, la variable dependiente (costo, ganancia, altura) se grafica en el eje vertical Y."
+            }
+        ];
+
+        // Estado actual de la evaluación
+        let activeQuizQuestions = [];
+        let studentAnswers = {};
+        let finalScore = 0;
+
+        // SELECCIONAR 5 PREGUNTAS ALEATORIAS SIN REPETICIÓN
+        function generateRandomQuiz() {
+            // Shuffle copia del banco de preguntas
+            const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+            activeQuizQuestions = shuffled.slice(0, 5);
+            studentAnswers = {};
+            finalScore = 0;
+
+            document.getElementById('quiz-score-num').innerText = "0 / 10";
+            const badge = document.getElementById('status-badge');
+            badge.className = "px-4 py-2 rounded-xl text-center bg-slate-200 text-slate-600 font-bold text-sm";
+            badge.innerText = "Sin Evaluar";
+
+            document.getElementById('quiz-results').classList.add('hidden');
+            document.getElementById('quiz-action-bar').classList.remove('hidden');
+
+            renderQuizQuestions();
+        }
+
+        // RENDERIZAR PREGUNTAS EN EL HTML
+        function renderQuizQuestions() {
+            const container = document.getElementById('quiz-questions-container');
+            container.innerHTML = activeQuizQuestions.map((q, idx) => `
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 shadow-sm transition hover:border-amber-300" id="q-card-${idx}">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+                        <h4 class="font-bold text-sm text-slate-800 flex items-start gap-2">
+                            <span class="w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs shrink-0 mt-0.5">${idx + 1}</span>
+                            <span>${q.question}</span>
+                        </h4>
+                        <button onclick="checkSingleQuestion(${idx})" class="self-end sm:self-auto px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-sm shrink-0">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Autocorregir Pregunta
+                        </button>
+                    </div>
+                    <div class="space-y-2 text-xs pl-8">
+                        ${q.options.map((opt, optIdx) => `
+                            <label class="flex items-center gap-3 p-3 rounded-xl border bg-white cursor-pointer hover:bg-amber-50/50 transition">
+                                <input type="radio" name="quiz-q-${idx}" value="${optIdx}" onchange="selectOption(${idx}, ${optIdx})" class="accent-amber-600 w-4 h-4">
+                                <span class="text-slate-700 font-medium">${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div id="feedback-q-${idx}" class="mt-3 ml-8 text-xs font-semibold hidden p-3 rounded-xl"></div>
+                </div>
+            `).join('');
+        }
+
+        function selectOption(qIdx, optIdx) {
+            studentAnswers[qIdx] = optIdx;
+        }
+
+        // AUTOCORREGIR UNA SOLA PREGUNTA EN TIEMPO REAL
+        function checkSingleQuestion(idx) {
+            const q = activeQuizQuestions[idx];
+            const selectedOpt = studentAnswers[idx];
+            const feedbackEl = document.getElementById(`feedback-q-${idx}`);
+            
+            if (selectedOpt === undefined) {
+                alert("Por favor, selecciona una alternativa antes de autocorregir esta pregunta.");
+                return;
+            }
+
+            if (selectedOpt === q.correct) {
+                feedbackEl.className = "mt-3 ml-8 text-xs font-semibold block p-3 rounded-xl bg-emerald-100 text-emerald-900 border border-emerald-300";
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> <strong>¡Correcto! (+2 pts)</strong> ${q.explanation}`;
+            } else {
+                feedbackEl.className = "mt-3 ml-8 text-xs font-semibold block p-3 rounded-xl bg-rose-100 text-rose-900 border border-rose-300";
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1"></i> <strong>Incorrecto.</strong> Respuesta correcta: "${q.options[q.correct]}". ${q.explanation}`;
+            }
+        }
+
+        // EVALUAR CUESTIONARIO COMPLETO
+        function checkQuiz() {
+            const studentName = document.getElementById('student-name').value.trim();
+            if (!studentName) {
+                alert("Por favor, ingresa tu Nombre y Apellido para finalizar la evaluación.");
+                return;
+            }
+
+            let correctCount = 0;
+
+            activeQuizQuestions.forEach((q, idx) => {
+                const selectedOpt = studentAnswers[idx];
+                const feedbackEl = document.getElementById(`feedback-q-${idx}`);
+
+                if (selectedOpt === q.correct) {
+                    correctCount++;
+                    feedbackEl.className = "mt-3 ml-8 text-xs font-semibold block p-3 rounded-xl bg-emerald-100 text-emerald-900 border border-emerald-300";
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> <strong>¡Correcto! (+2 pts)</strong> ${q.explanation}`;
+                } else {
+                    feedbackEl.className = "mt-3 ml-8 text-xs font-semibold block p-3 rounded-xl bg-rose-100 text-rose-900 border border-rose-300";
+                    feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-1"></i> <strong>Incorrecto.</strong> Respuesta correcta: "${q.options[q.correct]}". ${q.explanation}`;
+                }
+            });
+
+            // Calificación en escala de 0 a 10 (cada respuesta correcta vale 2 puntos)
+            finalScore = correctCount * 2;
+
+            document.getElementById('quiz-score-num').innerText = `${finalScore} / 10`;
+
+            const resultsCard = document.getElementById('results-card');
+            const resultsTitle = document.getElementById('results-title');
+            const resultsDetail = document.getElementById('results-detail');
+            const statusBox = document.getElementById('results-status-box');
+            const statusBadge = document.getElementById('status-badge');
+
+            const isPassed = finalScore >= 7;
+
+            if (isPassed) {
+                resultsCard.className = "p-6 rounded-2xl border-2 border-emerald-400 bg-emerald-50 text-emerald-950 text-center shadow-md";
+                resultsTitle.innerText = "¡FELICITACIONES! HAS APROBADO EL DESAFÍO";
+                resultsDetail.innerText = `Alumno/a: ${studentName} | Respuestas correctas: ${correctCount} de 5 (${finalScore}/10 pts)`;
+                statusBox.className = "inline-block px-8 py-2 rounded-full font-black text-lg tracking-wider uppercase bg-emerald-600 text-white shadow-lg";
+                statusBox.innerText = "ESTADO: APROBADO";
+
+                statusBadge.className = "px-4 py-2 rounded-xl text-center bg-emerald-600 text-white font-bold text-sm shadow";
+                statusBadge.innerText = "APROBADO";
+            } else {
+                resultsCard.className = "p-6 rounded-2xl border-2 border-rose-400 bg-rose-50 text-rose-950 text-center shadow-md";
+                resultsTitle.innerText = "DESAFÍO NO ALCANZADO - REQUIERE REVISIÓN";
+                resultsDetail.innerText = `Alumno/a: ${studentName} | Respuestas correctas: ${correctCount} de 5 (${finalScore}/10 pts)`;
+                statusBox.className = "inline-block px-8 py-2 rounded-full font-black text-lg tracking-wider uppercase bg-rose-600 text-white shadow-lg";
+                statusBox.innerText = "ESTADO: DESAPROBADO";
+
+                statusBadge.className = "px-4 py-2 rounded-xl text-center bg-rose-600 text-white font-bold text-sm shadow";
+                statusBadge.innerText = "DESAPROBADO";
+            }
+
+            document.getElementById('quiz-results').classList.remove('hidden');
+        }
+
+        // GENERAR SALIDA EN PDF CON LAS PREGUNTAS Y PUNTUACIÓN DE CADA ALUMNO
+        function downloadPDF() {
+            const studentName = document.getElementById('student-name').value.trim() || "Estudiante";
+            const dateStr = new Date().toLocaleString('es-AR');
+            const isPassed = finalScore >= 7 ? 'APROBADO' : 'DESAPROBADO';
+            const badgeBg = finalScore >= 7 ? '#10b981' : '#ef4444';
+
+            // Crear un contenedor flotante temporal con diseño institucional listo para la exportación PDF
+            const container = document.createElement('div');
+            container.style.padding = '30px';
+            container.style.fontFamily = "'Outfit', sans-serif";
+            container.style.color = '#1e293b';
+            container.style.backgroundColor = '#ffffff';
+
+            let pdfHtml = `
+                <div style="border-bottom: 3px solid #7b1113; padding-bottom: 15px; margin-bottom: 20px; text-align: center;">
+                    <h1 style="color: #7b1113; font-size: 24px; margin: 0 0 5px 0; font-weight: 800;">Mendoza TourMath - Comprobante de Evaluación</h1>
+                    <p style="color: #64748b; font-size: 13px; margin: 0;">Matemática 2° Año - Secundaria Orientada en Turismo</p>
+                    <p style="color: #d97706; font-weight: bold; font-size: 12px; margin: 5px 0 0 0;">Diseño Didáctico & Digital: Prof. Nelson Garro</p>
+                </div>
+
+                <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                    <table style="width: 100%; font-size: 13px;">
+                        <tr>
+                            <td style="padding: 4px 0;"><strong>Alumno/a:</strong> ${studentName}</td>
+                            <td style="padding: 4px 0; text-align: right;"><strong>Fecha:</strong> ${dateStr}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px 0;"><strong>Calificación Final:</strong> <span style="font-size: 16px; font-weight: bold; color: #0f172a;">${finalScore} / 10 pts</span></td>
+                            <td style="padding: 4px 0; text-align: right;">
+                                <strong>Estado:</strong> 
+                                <span style="background-color: ${badgeBg}; color: white; padding: 4px 12px; border-radius: 15px; font-weight: bold; font-size: 11px;">
+                                    ${isPassed}
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h3 style="font-size: 15px; color: #0f172a; border-bottom: 1px solid #cbd5e1; padding-bottom: 6px; margin-bottom: 15px;">
+                    Detalle de Preguntas Realizadas y Puntuación (2 pts por cada respuesta correcta)
+                </h3>
+            `;
+
+            activeQuizQuestions.forEach((q, idx) => {
+                const userChoice = studentAnswers[idx];
+                const isCorrect = userChoice === q.correct;
+                const userText = userChoice !== undefined && q.options[userChoice] ? q.options[userChoice] : "Sin responder";
+                const statusColor = isCorrect ? '#059669' : '#dc2626';
+                const statusBg = isCorrect ? '#ecfdf5' : '#fef2f2';
+                const statusBorder = isCorrect ? '#a7f3d0' : '#fecaca';
+
+                pdfHtml += `
+                    <div style="background-color: ${statusBg}; border: 1px solid ${statusBorder}; border-radius: 8px; padding: 12px; margin-bottom: 12px; page-break-inside: avoid;">
+                        <div style="font-weight: bold; font-size: 13px; color: #1e293b; margin-bottom: 6px;">
+                            ${idx + 1}. ${q.question}
+                        </div>
+                        <div style="font-size: 12px; color: #334155; margin-bottom: 4px;">
+                            <strong>Respuesta del estudiante:</strong> ${userText}
+                        </div>
+                        <div style="font-size: 12px; color: ${statusColor}; font-weight: bold; margin-bottom: 4px;">
+                            Resultado: ${isCorrect ? '¡Correcto! (+2 pts)' : 'Incorrecto (0 pts)'} 
+                            ${!isCorrect ? `<span style="color: #475569; font-weight: normal; margin-left: 8px;">(Correcta: "${q.options[q.correct]}")</span>` : ''}
+                        </div>
+                        <div style="font-size: 11px; color: #64748b; font-style: italic; margin-top: 4px; border-top: 1px dashed ${statusBorder}; padding-top: 4px;">
+                            Explicación didáctica: ${q.explanation}
+                        </div>
+                    </div>
+                `;
+            });
+
+            pdfHtml += `
+                <div style="margin-top: 25px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+                    Documento de evaluación generado para ser entregado al Prof. Nelson Garro • Mendoza TourMath
+                </div>
+            `;
+
+            container.innerHTML = pdfHtml;
+            document.body.appendChild(container);
+
+            const opt = {
+                margin:       10,
+                filename:     `Evaluacion_TourMath_${studentName.replace(/\s+/g, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(container).save().then(() => {
+                document.body.removeChild(container);
+            }).catch(err => {
+                console.error('Error al generar PDF:', err);
+                if (document.body.contains(container)) {
+                    document.body.removeChild(container);
+                }
+                alert("Hubo un problema al generar el PDF. Asegúrate de contar con conexión a internet.");
+            });
+        }
+
+        // DESCARGAR RESUMEN EN ARCHIVO DE TEXTO PLANO (.TXT) PARA EL PROFESOR NELSON GARRO
+        function downloadTXT() {
+            const studentName = document.getElementById('student-name').value.trim() || "Estudiante";
+            const dateStr = new Date().toLocaleString('es-AR');
+            const isPassed = finalScore >= 7 ? 'APROBADO' : 'DESAPROBADO';
+
+            let reportText = `====================================================\n`;
+            reportText += `MENDOZA TOURMATH - COMPROBANTE DE EVALUACIÓN\n`;
+            reportText += `Diseño Didáctico & Digital: Prof. Nelson Garro\n`;
+            reportText += `Materia: Matemática 2° Año - Orientación en Turismo\n`;
+            reportText += `====================================================\n\n`;
+            reportText += `Alumno/a: ${studentName}\n`;
+            reportText += `Fecha de Evaluación: ${dateStr}\n`;
+            reportText += `Calificación Final: ${finalScore} / 10 pts\n`;
+            reportText += `Estado de Aprobación: ${isPassed}\n\n`;
+            reportText += `----------------------------------------------------\n`;
+            reportText += `DETALLE DE PREGUNTAS Y RESPUESTAS ELEGIDAS:\n`;
+            reportText += `----------------------------------------------------\n\n`;
+
+            activeQuizQuestions.forEach((q, idx) => {
+                const userChoice = studentAnswers[idx];
+                const isCorrect = userChoice === q.correct;
+                const userText = userChoice !== undefined && q.options[userChoice] ? q.options[userChoice] : "Sin responder";
+                
+                reportText += `Pregunta ${idx + 1}: ${q.question}\n`;
+                reportText += `  - Respuesta del Alumno: ${userText}\n`;
+                reportText += `  - Evaluación: ${isCorrect ? 'CORRECTA [✔]' : 'INCORRECTA [✖]'}\n`;
+                if (!isCorrect) {
+                    reportText += `  - Respuesta Correcta: ${q.options[q.correct]}\n`;
+                }
+                reportText += `  - Explicación Didáctica: ${q.explanation}\n\n`;
+            });
+
+            reportText += `====================================================\n`;
+            reportText += `Documento generado para ser entregado al Prof. Nelson Garro\n`;
+            reportText += `====================================================\n`;
+
+            const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Reporte_TourMath_${studentName.replace(/\s+/g, '_')}.txt`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // COPIAR RESUMEN EN TEXTO PLANO FORMATO WHATSAPP / CLASSROOM / EMAIL
+        function copyTextReport() {
+            const studentName = document.getElementById('student-name').value.trim() || "Estudiante";
+            const dateStr = new Date().toLocaleString('es-AR');
+            const isPassed = finalScore >= 7 ? 'APROBADO' : 'DESAPROBADO';
+
+            let reportText = `📊 *MENDOZA TOURMATH - REPORTE DE EVALUACIÓN*\n`;
+            reportText += `👨‍🏫 *Diseño Didáctico:* Prof. Nelson Garro\n`;
+            reportText += `👤 *Alumno/a:* ${studentName}\n`;
+            reportText += `📅 *Fecha:* ${dateStr}\n`;
+            reportText += `📝 *Calificación:* ${finalScore} / 10 pts\n`;
+            reportText += `📌 *Estado:* ${isPassed}\n\n`;
+            reportText += `--- DETALLE DE PREGUNTAS ---\n`;
+
+            activeQuizQuestions.forEach((q, idx) => {
+                const userChoice = studentAnswers[idx];
+                const isCorrect = userChoice === q.correct;
+                const userText = userChoice !== undefined && q.options[userChoice] ? q.options[userChoice] : "Sin responder";
+                reportText += `${idx + 1}. ${q.question}\n`;
+                reportText += `   Rta: ${userText} ${isCorrect ? '✔ (Correcta)' : '✖ (Incorrecta)'}\n`;
+                if (!isCorrect) {
+                    reportText += `   Correcta era: ${q.options[q.correct]}\n`;
+                }
+                reportText += `\n`;
+            });
+
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = reportText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempTextArea);
+
+            const toast = document.getElementById('copy-toast');
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 4500);
+        }
+
+        // --- CAMBIO DE PESTAÑAS ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white', 'shadow-md', 'bg-amber-500', 'text-slate-900');
+                btn.classList.add('bg-white', 'text-slate-600');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            
+            if (tabId === 'desafío') {
+                activeBtn.classList.remove('bg-white', 'text-slate-600');
+                activeBtn.classList.add('bg-amber-500', 'text-slate-900', 'shadow-md');
+            } else {
+                activeBtn.classList.remove('bg-white', 'text-slate-600');
+                activeBtn.classList.add('bg-slate-900', 'text-white', 'shadow-md');
+            }
+        }
+
+        // --- MÓDULO 1: FUNCIÓN LINEAL ---
+        function initLinearChart() {
+            const ctx = document.getElementById('linearChart').getContext('2d');
+            linearChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [0, 5, 10, 15, 20, 25, 30],
+                    datasets: [{
+                        label: 'Costo Total de Excursión ($ USD)',
+                        data: [],
+                        borderColor: '#a8201a',
+                        backgroundColor: 'rgba(168, 32, 26, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0,
+                        pointBackgroundColor: '#7b1113',
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Cantidad de Pasajeros (x)' } },
+                        y: { title: { display: true, text: 'Costo Total USD (y)' }, beginAtZero: true }
+                    }
+                }
+            });
+            updateLinearModel();
+        }
+
+        function syncFromInputLinear() {
+            const inputM = parseFloat(document.getElementById('input-m').value) || 0;
+            const inputB = parseFloat(document.getElementById('input-b').value) || 0;
+
+            document.getElementById('slider-m').value = inputM;
+            document.getElementById('slider-b').value = inputB;
+            
+            updateLinearModel(false);
+        }
+
+        function updateLinearModel(syncInputs = true) {
+            const m = parseFloat(document.getElementById('slider-m').value);
+            const b = parseFloat(document.getElementById('slider-b').value);
+
+            if (syncInputs) {
+                document.getElementById('input-m').value = m;
+                document.getElementById('input-b').value = b;
+            }
+
+            document.getElementById('val-m').innerText = `$${m} USD`;
+            document.getElementById('val-b').innerText = `$${b} USD`;
+            document.getElementById('text-b-meaning').innerText = `$${b} USD`;
+            document.getElementById('text-m-step').innerText = `$${m * 10} USD`;
+
+            const xValues = [0, 5, 10, 15, 20, 25, 30];
+            const yValues = xValues.map(x => m * x + b);
+
+            linearChart.data.datasets[0].data = yValues;
+            linearChart.update();
+
+            // Actualizar tabla
+            const tableRow = document.getElementById('linear-table-row');
+            tableRow.innerHTML = `<td class="p-2 border bg-slate-50 text-slate-800">Costo Total ($)</td>` +
+                xValues.slice(0, 6).map(x => `<td class="p-2 border">$${m * x + b}</td>`).join('');
+        }
+
+        // --- MÓDULO 2: FUNCIÓN CUADRÁTICA (TIROLINA) ---
+        function initQuadChart() {
+            const ctx = document.getElementById('quadChart').getContext('2d');
+            quadChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 61}, (_, i) => i), // 0 a 60 metros
+                    datasets: [{
+                        label: 'Altura del Cable / Turista (m)',
+                        data: [],
+                        borderColor: '#4338ca',
+                        backgroundColor: 'rgba(67, 56, 202, 0.15)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Distancia Recorrida (m)' } },
+                        y: { title: { display: true, text: 'Altura respecto al Suelo (m)' }, beginAtZero: true }
+                    }
+                }
+            });
+            updateQuadraticModel();
+        }
+
+        function syncFromInputQuad() {
+            const inputA = parseFloat(document.getElementById('input-quad-a').value) || 0;
+            const inputB = parseFloat(document.getElementById('input-quad-b').value) || 0;
+            const inputC = parseFloat(document.getElementById('input-quad-c').value) || 0;
+
+            document.getElementById('slider-quad-a').value = inputA;
+            document.getElementById('slider-quad-b').value = inputB;
+            document.getElementById('slider-quad-c').value = inputC;
+
+            updateQuadraticModel(false);
+        }
+
+        function updateQuadraticModel(syncInputs = true) {
+            const a = parseFloat(document.getElementById('slider-quad-a').value);
+            const b = parseFloat(document.getElementById('slider-quad-b').value);
+            const c = parseFloat(document.getElementById('slider-quad-c').value);
+
+            if (syncInputs) {
+                document.getElementById('input-quad-a').value = a;
+                document.getElementById('input-quad-b').value = b;
+                document.getElementById('input-quad-c').value = c;
+            }
+
+            document.getElementById('val-quad-a').innerText = a;
+            document.getElementById('val-quad-b').innerText = b;
+            document.getElementById('val-quad-c').innerText = `${c} m`;
+
+            const xVals = Array.from({length: 61}, (_, i) => i);
+            const yVals = xVals.map(x => (a * x * x) + (b * x) + c);
+
+            // Vértice Xv = -b / (2a)
+            const xv = a !== 0 ? -b / (2 * a) : 0;
+            const yv = (a * xv * xv) + (b * xv) + c;
+
+            document.getElementById('quad-vertex').innerText = `(${xv.toFixed(1)}m, ${yv.toFixed(1)}m)`;
+            document.getElementById('quad-min-h').innerText = `${yv.toFixed(1)} metros`;
+
+            quadChart.data.datasets[0].data = yVals;
+            quadChart.update();
+        }
+
+        // --- MÓDULO 3: OPTIMIZACIÓN DE INGRESOS ---
+        function initProfitChart() {
+            const ctx = document.getElementById('profitChart').getContext('2d');
+            profitChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [0, 5, 10, 15, 20, 25, 30, 35, 40],
+                    datasets: [
+                        {
+                            label: 'Curva de Ingreso Total ($)',
+                            data: [],
+                            borderColor: '#059669',
+                            backgroundColor: 'rgba(5, 150, 105, 0.15)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Punto Seleccionado Actual',
+                            data: [],
+                            borderColor: '#e11d48',
+                            backgroundColor: '#e11d48',
+                            pointRadius: 7,
+                            showLine: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Precio del Boleto USD ($)' } },
+                        y: { title: { display: true, text: 'Recaudación Total USD ($)' }, beginAtZero: true }
+                    }
+                }
+            });
+            updateProfitModel();
+        }
+
+        function syncFromInputProfit() {
+            updateProfitModel();
+        }
+
+        function updateProfitModel() {
+            const p = parseFloat(document.getElementById('slider-price').value);
+            document.getElementById('val-price').innerText = `$${p} USD`;
+
+            // Parámetros editables de la función cuadrática canonica: I(p) = -a*(p - xv)^2 + yv
+            const factorA = parseFloat(document.getElementById('input-prof-a').value) || 10;
+            const xv = parseFloat(document.getElementById('input-prof-xv').value) || 20;
+            const yv = parseFloat(document.getElementById('input-prof-yv').value) || 4000;
+
+            const revenue = -factorA * Math.pow(p - xv, 2) + yv;
+            const passengers = Math.round(revenue / (p || 1));
+
+            document.getElementById('stat-passengers').innerText = (p > 0 && revenue > 0) ? `${passengers} pax` : `0 pax`;
+            document.getElementById('stat-revenue').innerText = `$${Math.max(0, revenue).toLocaleString()} USD`;
+
+            const prices = [0, 5, 10, 15, 20, 25, 30, 35, 40];
+            const revCurve = prices.map(price => Math.max(0, -factorA * Math.pow(price - xv, 2) + yv));
+
+            profitChart.data.datasets[0].data = revCurve;
+            
+            // Colocar marcador en el precio actual
+            const pointData = prices.map(price => price === p ? Math.max(0, revenue) : null);
+            profitChart.data.datasets[1].data = pointData;
+
+            profitChart.update();
+        }
+
+        // --- MÓDULO 4: CLIMA NO LINEAL EN ACONCAGUA ---
+        function initClimateChart() {
+            const ctx = document.getElementById('climateChart').getContext('2d');
+            climateChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00', '24:00'],
+                    datasets: [{
+                        label: 'Temperatura (°C)',
+                        data: [2, -1, -4, 5, 14, 18, 12, 6, 3],
+                        borderColor: '#0284c7',
+                        backgroundColor: 'rgba(2, 132, 199, 0.15)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Hora del Día' } },
+                        y: { title: { display: true, text: 'Temperatura (°C)' } }
+                    }
+                }
+            });
+        }
+
+        function setSeason(season) {
+            const btnV = document.getElementById('btn-verano');
+            const btnI = document.getElementById('btn-invierno');
+
+            if (season === 'verano') {
+                btnV.className = "px-3 py-2 rounded-lg font-bold text-xs bg-sky-600 text-white shadow";
+                btnI.className = "px-3 py-2 rounded-lg font-bold text-xs bg-white text-slate-700 border hover:bg-slate-100";
+                climateChart.data.datasets[0].data = [2, -1, -4, 5, 14, 18, 12, 6, 3];
+                climateChart.data.datasets[0].borderColor = '#0284c7';
+            } else {
+                btnI.className = "px-3 py-2 rounded-lg font-bold text-xs bg-sky-600 text-white shadow";
+                btnV.className = "px-3 py-2 rounded-lg font-bold text-xs bg-white text-slate-700 border hover:bg-slate-100";
+                climateChart.data.datasets[0].data = [-12, -15, -18, -10, -2, 1, -5, -9, -11];
+                climateChart.data.datasets[0].borderColor = '#3730a3';
+            }
+            climateChart.update();
+        }
+
+        // --- INICIALIZACIÓN GLOBAL AL CARGAR ---
+        window.onload = function() {
+            initLinearChart();
+            initQuadChart();
+            initProfitChart();
+            initClimateChart();
+            generateRandomQuiz();
+        };
+    </script>
+</body>
+</html>
