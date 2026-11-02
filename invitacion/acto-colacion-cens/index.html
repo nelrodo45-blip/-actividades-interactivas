@@ -22,31 +22,32 @@
         }
         
         .text-gold {
-            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            background: linear-gradient(to right, #ffffff, #ffe885, #ffd700, #ffc107, #ffb300);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.9), 0 0 10px rgba(0, 0, 0, 1), 2px 2px 5px rgba(0,0,0,1);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.9));
         }
 
         .bg-gold {
-            background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728);
+            background: linear-gradient(to bottom, #ffe885, #ffd700, #b8860b);
         }
 
         @keyframes soundwave {
-            0%, 100% { transform: scaleY(0.8); opacity: 0.8; }
-            50% { transform: scaleY(1.2); opacity: 1; }
+            0%, 100% { transform: scaleY(0.7); opacity: 0.7; }
+            50% { transform: scaleY(1.4); opacity: 1; }
         }
 
         .bar {
-            animation: soundwave 1.5s ease-in-out infinite;
+            animation: soundwave 1.2s ease-in-out infinite;
             transform-origin: center;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
         }
         
-        .bar:nth-child(odd) { animation-duration: 1.2s; }
-        .bar:nth-child(3n) { animation-duration: 1.8s; }
-        .bar:nth-child(4n) { animation-duration: 1.4s; }
-
+        .bar:nth-child(odd) { animation-duration: 1.0s; }
+        .bar:nth-child(3n) { animation-duration: 1.5s; }
+        .bar:nth-child(4n) { animation-duration: 1.2s; }
         /* Fondo que combina la textura oscura con una imagen de egresados superpuesta sutilmente */
         .card-bg {
             background-image: 
@@ -112,11 +113,6 @@
         </div>
     </div>
 
-    <a href="../index.html" aria-label="Volver a invitaciones"
-       class="fixed top-4 left-4 z-40 rounded-full border border-yellow-600/60 bg-black/80 px-4 py-2 text-xs sm:text-sm font-semibold text-yellow-300 shadow-lg hover:bg-yellow-900/60 transition">
-       ← Volver a invitaciones
-    </a>
-
     <div class="card-bg w-full max-w-lg rounded-3xl shadow-2xl border border-yellow-700/40 overflow-hidden relative mt-16 mb-8">
         
         <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-60"></div>
@@ -126,9 +122,10 @@
             <div class="mb-5 space-y-2">
                 <p class="text-gray-300 text-xs sm:text-sm uppercase tracking-[0.3em]">CENS N° 3-468</p>
                 <h2 class="text-gray-100 text-lg sm:text-xl font-semibold tracking-wider font-serif">"Daniel Prieto Castillo"</h2>
-                <p class="text-gray-400 text-sm mt-3 italic">Tiene el honor de invitar a usted al</p>
-                <h3 class="text-white text-xl sm:text-2xl font-bold uppercase tracking-widest mt-1 drop-shadow-md">Acto de Colación de Grado</h3>
-                <p class="text-yellow-500 text-sm font-semibold tracking-widest">Egresados de 3° Año</p>
+                <p class="text-gray-300 text-sm mt-3 font-medium">Tiene el honor de invitar a usted al</p>
+                <!-- Fondo aclarado y placa translúcida reforzada para el Acto de Colación -->
+                <h3 class="text-yellow-200 text-3xl sm:text-4xl font-black uppercase tracking-wider mt-1 drop-shadow-[0_4px_12px_rgba(0,0,0,1)] bg-gray-900/90 py-3 px-4 rounded-2xl border-2 border-yellow-400/80 shadow-[0_0_20px_rgba(0,0,0,0.9)]">Acto de Colación de Grado</h3>
+                <p class="text-yellow-300 text-sm font-extrabold tracking-widest mt-2">Egresados de 3° Año</p>
             </div>
 
             <!-- Imagen de Egresados del CENS -->
@@ -143,26 +140,30 @@
             <div class="w-24 h-px bg-gradient-to-r from-transparent via-yellow-500 to-transparent mb-4 opacity-60"></div>
 
             <div class="my-4 w-full">
-                <h1 class="text-4xl sm:text-5xl font-bold font-serif uppercase tracking-tight text-gold mb-4 leading-tight">
-                    Voces Que<br>Dejan Huella
-                </h1>
-
-                <div class="flex items-center justify-center gap-[3px] sm:gap-1 h-16 sm:h-20 my-5 opacity-90">
-                    <div class="bar w-1.5 sm:w-2 bg-gold h-4 rounded-full"></div>
-                    <div class="bar w-1.5 sm:w-2 bg-gold h-8 rounded-full"></div>
-                    <div class="bar w-1.5 sm:w-2 bg-gold h-12 rounded-full"></div>
-                    <div class="bar w-1.5 sm:w-2 bg-gold h-6 rounded-full"></div>
-                    <div class="bar w-1.5 sm:w-2 bg-gold h-16 rounded-full"></div>
-                    <div class="bar w-1.5 sm:w-2 bg-gold h-10 rounded-full"></div>
-                    <div class="bar w-1.5 sm:w-2 bg-gold h-20 rounded-full"></div>
-                    <div class="bar w-1.5 sm:w-2 bg-gold h-14 rounded-full"></div>
-                    <div class="bar w-1.5 sm:w-2 bg-gold h-20 rounded-full"></div>
-                    <div class="bar w-1.5 sm:w-2 bg-gold h-8 rounded-full"></div>
-                    <div class="bar w-1.5 sm:w-2 bg-gold h-12 rounded-full"></div>
-                    <div class="bar w-1.5 sm:w-2 bg-gold h-4 rounded-full"></div>
+                <!-- Título principal con un fondo mucho más claro y contrastado para máxima visibilidad en celular -->
+                <div class="bg-gray-900/90 border-2 border-yellow-400/80 rounded-2xl p-5 shadow-[0_0_30px_rgba(0,0,0,0.95)]">
+                    <h1 class="text-4xl sm:text-6xl font-black font-serif uppercase tracking-tight text-gold mb-3 leading-tight">
+                        Voces Que<br>Dejan Huella
+                    </h1>
                 </div>
 
-                <p class="text-yellow-100 text-lg font-light tracking-wide drop-shadow-sm">
+                <!-- Onda de sonido amplificada y con brillo llamativo para móviles -->
+                <div class="flex items-center justify-center gap-1 sm:gap-1.5 h-20 sm:h-24 my-6 py-2 px-4 bg-black/70 rounded-full border border-yellow-400 shadow-[0_0_25px_rgba(255,215,0,0.4)]">
+                    <div class="bar w-2 bg-gold h-5 rounded-full"></div>
+                    <div class="bar w-2 bg-gold h-10 rounded-full"></div>
+                    <div class="bar w-2.5 bg-gold h-16 rounded-full"></div>
+                    <div class="bar w-2 bg-gold h-8 rounded-full"></div>
+                    <div class="bar w-2.5 bg-gold h-20 rounded-full"></div>
+                    <div class="bar w-2 bg-gold h-12 rounded-full"></div>
+                    <div class="bar w-3 bg-gold h-24 rounded-full"></div>
+                    <div class="bar w-2.5 bg-gold h-16 rounded-full"></div>
+                    <div class="bar w-3 bg-gold h-22 rounded-full"></div>
+                    <div class="bar w-2 bg-gold h-10 rounded-full"></div>
+                    <div class="bar w-2.5 bg-gold h-14 rounded-full"></div>
+                    <div class="bar w-2 bg-gold h-6 rounded-full"></div>
+                </div>
+
+                <p class="text-yellow-100 text-lg sm:text-xl font-medium tracking-wide drop-shadow-md">
                     cada historia merece ser escuchada
                 </p>
             </div>
