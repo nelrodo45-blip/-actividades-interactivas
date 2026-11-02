@@ -1,541 +1,68 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invitación - Acto de Colación CENS N° 3-468</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Librerías para generar PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #0f172a;
-        }
-        .font-serif {
-            font-family: 'Playfair Display', serif;
-        }
-        .font-script {
-            font-family: 'Dancing Script', cursive;
-        }
-        
-        .text-gold {
-            background: linear-gradient(to right, #ffffff, #ffe885, #ffd700, #ffc107, #ffb300);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 0 30px rgba(255, 215, 0, 0.9), 0 0 10px rgba(0, 0, 0, 1), 2px 2px 5px rgba(0,0,0,1);
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.9));
-        }
-
-        .bg-gold {
-            background: linear-gradient(to bottom, #ffe885, #ffd700, #b8860b);
-        }
-
-        @keyframes soundwave {
-            0%, 100% { transform: scaleY(0.7); opacity: 0.7; }
-            50% { transform: scaleY(1.4); opacity: 1; }
-        }
-
-        .bar {
-            animation: soundwave 1.2s ease-in-out infinite;
-            transform-origin: center;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
-        }
-        
-        .bar:nth-child(odd) { animation-duration: 1.0s; }
-        .bar:nth-child(3n) { animation-duration: 1.5s; }
-        .bar:nth-child(4n) { animation-duration: 1.2s; }
-        /* Fondo que combina la textura oscura con una imagen de egresados superpuesta sutilmente */
-        .card-bg {
-            background-image: 
-                linear-gradient(to bottom, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.85)),
-                url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
-            background-size: cover;
-            background-position: center;
-            box-shadow: inset 0 0 120px rgba(0,0,0,0.9);
-        }
-        
-        /* Animación para el sobre de bienvenida */
-        .fade-out {
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 1s ease-out, visibility 1s ease-out;
-        }
-
-        /* Animación de la poesía flotando suavemente */
-        @keyframes floatPoem {
-            0% {
-                opacity: 0;
-                transform: translateY(30px) scale(0.95);
-            }
-            20% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-            80% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-30px) scale(0.95);
-            }
-        }
-
-        .floating-poem {
-            animation: floatPoem 7s ease-in-out infinite;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invitaciones | Profesorado en Informática</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:Montserrat,sans-serif;background:#0b1220}
+    .gold{background:linear-gradient(90deg,#bf953f,#fcf6ba,#b38728);-webkit-background-clip:text;background-clip:text;color:transparent}
+  </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 sm:p-8 bg-gray-900 overflow-x-hidden">
-
-    <!-- Pantalla de Bienvenida (Inicio interactivo) -->
-    <div id="welcomeOverlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-900 bg-opacity-95 backdrop-blur-md cursor-pointer transition-all duration-1000">
-        <div class="text-center space-y-6 p-8 border border-yellow-700/50 rounded-2xl bg-black/40 shadow-[0_0_50px_rgba(234,179,8,0.1)]">
-            <p class="text-yellow-500 tracking-[0.3em] text-sm uppercase">CENS N° 3-468</p>
-            <h1 class="text-3xl font-serif text-gold">Acto de Colación</h1>
-            <p class="text-gray-300 text-xs italic">"Voces que dejan huella"</p>
-            <button class="mt-4 px-8 py-3 rounded-full bg-gradient-to-r from-yellow-600 to-yellow-400 text-black font-bold tracking-widest uppercase text-sm hover:scale-105 transition-transform shadow-[0_0_20px_rgba(234,179,8,0.3)] animate-pulse">
-                Abrir Invitación
-            </button>
-        </div>
+<body class="min-h-screen text-slate-100">
+  <header class="border-b border-yellow-700/30 bg-slate-950/80">
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-5">
+      <div>
+        <p class="text-xs uppercase tracking-[.22em] text-yellow-500">IES N.º 9-011 · Profesorado en Informática</p>
+        <h1 class="mt-1 text-xl font-bold sm:text-2xl">Agenda de invitaciones</h1>
+        <p class="mt-1 text-xs text-slate-400">Prof. Nelson Garro</p>
+      </div>
+      <a href="../index.html" class="rounded-full border border-slate-600 px-4 py-2 text-xs font-semibold hover:border-yellow-500 hover:text-yellow-300">← Volver al portal</a>
     </div>
+  </header>
 
-    <!-- Contenedor de Poesía Flotante (Se activa al entrar a la página) -->
-    <div id="poemContainer" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-40 w-11/12 max-w-lg pointer-events-none hidden">
-        <div class="floating-poem bg-black/85 border border-yellow-500/60 rounded-2xl p-5 text-center shadow-[0_0_30px_rgba(234,179,8,0.3)] backdrop-blur-md">
-            <p id="poemText" class="text-yellow-200 text-xl sm:text-2xl font-script tracking-wide drop-shadow-lg leading-relaxed">
-                <!-- Se llena dinámicamente -->
-            </p>
+  <main class="mx-auto max-w-6xl px-5 py-12">
+    <section class="mb-10 max-w-3xl">
+      <p class="text-sm font-semibold uppercase tracking-[.25em] text-yellow-500">Comunidad educativa</p>
+      <h2 class="mt-3 text-3xl font-extrabold leading-tight sm:text-5xl">Invitaciones <span class="gold">especiales</span></h2>
+      <p class="mt-4 text-slate-300">Accedé a invitaciones interactivas, actos institucionales, jornadas y encuentros educativos.</p>
+    </section>
+
+    <section aria-labelledby="publicadas">
+      <div class="mb-5 flex items-center gap-3">
+        <span class="h-px flex-1 bg-yellow-700/40"></span>
+        <h3 id="publicadas" class="text-sm font-bold uppercase tracking-[.2em] text-yellow-400">Invitaciones publicadas</h3>
+        <span class="h-px flex-1 bg-yellow-700/40"></span>
+      </div>
+
+      <article class="overflow-hidden rounded-3xl border border-yellow-700/40 bg-slate-900 shadow-2xl md:grid md:grid-cols-[.9fr_1.1fr]">
+        <div class="flex min-h-64 flex-col justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-yellow-950/50 p-8">
+          <p class="text-xs font-bold uppercase tracking-[.25em] text-yellow-500">CENS N.º 3-468 · Daniel Prieto Castillo</p>
+          <h4 class="mt-4 text-3xl font-extrabold leading-tight">Acto de Colación de Grado</h4>
+          <p class="mt-3 text-sm text-slate-300">“Voces que dejan huella”</p>
+          <div class="mt-6 h-1 w-24 rounded-full bg-gradient-to-r from-yellow-700 via-yellow-200 to-yellow-700"></div>
         </div>
-    </div>
-
-    <div class="card-bg w-full max-w-lg rounded-3xl shadow-2xl border border-yellow-700/40 overflow-hidden relative mt-16 mb-8">
-        
-        <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-60"></div>
-
-        <div class="p-8 sm:p-12 text-center flex flex-col items-center relative z-10">
-            
-            <div class="mb-5 space-y-2">
-                <p class="text-gray-300 text-xs sm:text-sm uppercase tracking-[0.3em]">CENS N° 3-468</p>
-                <h2 class="text-gray-100 text-lg sm:text-xl font-semibold tracking-wider font-serif">"Daniel Prieto Castillo"</h2>
-                <p class="text-gray-300 text-sm mt-3 font-medium">Tiene el honor de invitar a usted al</p>
-                <!-- Fondo aclarado y placa translúcida reforzada para el Acto de Colación -->
-                <h3 class="text-yellow-200 text-3xl sm:text-4xl font-black uppercase tracking-wider mt-1 drop-shadow-[0_4px_12px_rgba(0,0,0,1)] bg-gray-900/90 py-3 px-4 rounded-2xl border-2 border-yellow-400/80 shadow-[0_0_20px_rgba(0,0,0,0.9)]">Acto de Colación de Grado</h3>
-                <p class="text-yellow-300 text-sm font-extrabold tracking-widest mt-2">Egresados de 3° Año</p>
-            </div>
-
-            <!-- Imagen de Egresados del CENS -->
-            <div class="w-full h-40 sm:h-48 mt-2 mb-4 rounded-xl overflow-hidden relative shadow-[0_0_20px_rgba(0,0,0,0.5)] border border-yellow-700/30">
-                <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                     alt="Alumnos Egresados" 
-                     class="w-full h-full object-cover object-center opacity-85 hover:opacity-100 transition-opacity duration-700 sepia-[.2] contrast-125">
-                <div class="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/20 to-transparent"></div>
-                <div class="absolute inset-0 bg-gradient-to-b from-[#0f172a]/40 to-transparent"></div>
-            </div>
-
-            <div class="w-24 h-px bg-gradient-to-r from-transparent via-yellow-500 to-transparent mb-4 opacity-60"></div>
-
-            <div class="my-4 w-full">
-                <!-- Título principal con un fondo mucho más claro y contrastado para máxima visibilidad en celular -->
-                <div class="bg-gray-900/90 border-2 border-yellow-400/80 rounded-2xl p-5 shadow-[0_0_30px_rgba(0,0,0,0.95)]">
-                    <h1 class="text-4xl sm:text-6xl font-black font-serif uppercase tracking-tight text-gold mb-3 leading-tight">
-                        Voces Que<br>Dejan Huella
-                    </h1>
-                </div>
-
-                <!-- Onda de sonido amplificada y con brillo llamativo para móviles -->
-                <div class="flex items-center justify-center gap-1 sm:gap-1.5 h-20 sm:h-24 my-6 py-2 px-4 bg-black/70 rounded-full border border-yellow-400 shadow-[0_0_25px_rgba(255,215,0,0.4)]">
-                    <div class="bar w-2 bg-gold h-5 rounded-full"></div>
-                    <div class="bar w-2 bg-gold h-10 rounded-full"></div>
-                    <div class="bar w-2.5 bg-gold h-16 rounded-full"></div>
-                    <div class="bar w-2 bg-gold h-8 rounded-full"></div>
-                    <div class="bar w-2.5 bg-gold h-20 rounded-full"></div>
-                    <div class="bar w-2 bg-gold h-12 rounded-full"></div>
-                    <div class="bar w-3 bg-gold h-24 rounded-full"></div>
-                    <div class="bar w-2.5 bg-gold h-16 rounded-full"></div>
-                    <div class="bar w-3 bg-gold h-22 rounded-full"></div>
-                    <div class="bar w-2 bg-gold h-10 rounded-full"></div>
-                    <div class="bar w-2.5 bg-gold h-14 rounded-full"></div>
-                    <div class="bar w-2 bg-gold h-6 rounded-full"></div>
-                </div>
-
-                <p class="text-yellow-100 text-lg sm:text-xl font-medium tracking-wide drop-shadow-md">
-                    cada historia merece ser escuchada
-                </p>
-            </div>
-
-            <div class="w-24 h-px bg-gradient-to-r from-transparent via-yellow-500 to-transparent my-5 opacity-60"></div>
-
-            <!-- Frase principal -->
-            <div class="mb-8 px-2">
-                <p class="text-yellow-400/90 text-2xl sm:text-3xl font-script leading-relaxed drop-shadow-md">
-                    «Compartimos desafíos, sueños y aprendizajes. Descubrimos que nuestra propia voz tiene un valor inmenso. Hoy celebramos esas huellas imborrables.»
-                </p>
-            </div>
-
-            <div class="w-full bg-black/50 border border-yellow-700/40 rounded-xl p-5 flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 text-sm text-gray-200 backdrop-blur-sm">
-                <div class="flex items-center gap-2">
-                    <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span>Fecha: __/__/____</span>
-                </div>
-                <div class="hidden sm:block w-1.5 h-1.5 bg-yellow-600 rounded-full"></div>
-                <div class="flex items-center gap-2">
-                    <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span>Hora: __:__ hs</span>
-                </div>
-                <div class="hidden sm:block w-1.5 h-1.5 bg-yellow-600 rounded-full"></div>
-                <div class="flex items-center gap-2">
-                    <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    <span>Lugar: ______________</span>
-                </div>
-            </div>
-
-            <!-- Formulario de Confirmación de Asistencia -->
-            <div class="mt-8 w-full border-t border-yellow-700/30 pt-6">
-                <h4 class="text-yellow-500 font-semibold mb-4 tracking-widest uppercase text-xs sm:text-sm drop-shadow-md">Confirmar Asistencia</h4>
-                
-                <form id="rsvpForm" class="space-y-3 w-full max-w-sm mx-auto">
-                    <input type="text" id="nombre" placeholder="Nombre y Apellido del Egresado/a" required 
-                           class="w-full bg-black/60 border border-yellow-700/50 rounded-lg p-2.5 text-gray-200 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 placeholder-gray-500 text-sm transition-all">
-                    
-                    <div class="flex gap-3">
-                        <input type="number" id="acompanantes" placeholder="N° de Invitados" min="0" max="10" required
-                               class="w-1/2 bg-black/60 border border-yellow-700/50 rounded-lg p-2.5 text-gray-200 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 placeholder-gray-500 text-sm transition-all">
-                        
-                        <select id="asistencia" class="w-1/2 bg-black/60 border border-yellow-700/50 rounded-lg p-2.5 text-gray-200 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 text-sm transition-all appearance-none">
-                            <option value="si">Sí, asistiré</option>
-                            <option value="no">No podré ir</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" 
-                            class="w-full bg-gradient-to-r from-yellow-600 to-yellow-400 text-black font-bold rounded-lg p-2.5 mt-2 hover:from-yellow-400 hover:to-yellow-300 transition-colors shadow-[0_0_15px_rgba(234,179,8,0.2)] text-sm uppercase tracking-wider">
-                        Enviar Confirmación
-                    </button>
-                </form>
-                
-                <button id="btnVerInvitados" class="mt-4 text-[10px] sm:text-xs text-yellow-600/60 hover:text-yellow-400 underline decoration-yellow-600/40 transition-colors w-full text-center">
-                    Acceso Organizador: Ver lista de confirmados
-                </button>
-
-                <!-- Panel de Código de Acceso -->
-                <div id="passcodePanel" class="hidden mt-4 text-center bg-black/90 border border-yellow-700/50 rounded-lg p-5 w-full max-w-sm mx-auto shadow-inner backdrop-blur-md">
-                    <h5 class="text-yellow-500 text-sm font-bold mb-2">Acceso Restringido</h5>
-                    <p class="text-[11px] text-gray-300 mb-4">Ingresa el código organizador para ver la lista.</p>
-                    <input type="password" id="organizerPasscode" placeholder="Código" 
-                           class="w-full bg-black/60 border border-yellow-700/50 rounded-lg p-2.5 mb-2 text-center text-gray-200 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 text-sm transition-all tracking-[0.2em]">
-                    <p id="passcodeError" class="hidden text-red-400 text-[10px] mb-3">Código incorrecto. Intenta nuevamente.</p>
-                    <div class="flex gap-2 mt-2">
-                        <button id="btnCancelPasscode" class="w-1/2 bg-gray-800 text-gray-300 rounded-lg p-2 hover:bg-gray-700 transition text-xs border border-gray-600">Cancelar</button>
-                        <button id="btnSubmitPasscode" class="w-1/2 bg-gradient-to-r from-yellow-600 to-yellow-500 text-black font-bold rounded-lg p-2 hover:from-yellow-500 hover:to-yellow-400 transition text-xs">Acceder</button>
-                    </div>
-                </div>
-
-                <!-- Panel de Lista -->
-                <div id="panelInvitados" class="hidden mt-4 text-left bg-black/80 border border-yellow-700/50 rounded-lg p-4 max-h-64 overflow-y-auto w-full max-w-sm mx-auto shadow-inner backdrop-blur-md">
-                    <h5 class="text-yellow-500 text-sm font-bold border-b border-yellow-700/50 pb-2 mb-2">Lista de Asistentes</h5>
-                    <ul id="listaContenido" class="text-xs text-gray-300 space-y-2 mb-4">
-                        <li class="text-center text-gray-500 italic">Cargando invitados...</li>
-                    </ul>
-                    
-                    <div class="flex gap-2 mt-4 pt-2 border-t border-yellow-700/30">
-                        <button id="btnDescargarPDF" class="flex-1 bg-blue-600/80 text-white rounded p-1.5 hover:bg-blue-500 transition text-[11px] border border-blue-500 font-semibold shadow-md">Descargar PDF</button>
-                        <button id="btnBorrarLista" class="flex-1 bg-red-600/80 text-white rounded p-1.5 hover:bg-red-500 transition text-[11px] border border-red-500 font-semibold shadow-md">Borrar Lista</button>
-                    </div>
-                    <button id="btnCerrarPanel" class="mt-2 w-full bg-gray-800 text-gray-300 rounded p-1.5 hover:bg-gray-700 transition text-xs border border-gray-600">Cerrar panel</button>
-                </div>
-                
-                <div id="formMessage" class="hidden mt-4 bg-green-900/40 border border-green-500/50 text-green-300 rounded-lg p-4 text-sm font-medium backdrop-blur-sm text-center">
-                    ¡Gracias! Tu confirmación ha sido guardada exitosamente.<br>
-                    <span class="text-gray-300 text-xs mt-1 block">Esperamos verte en el acto.</span>
-                </div>
-
-                <!-- Modal de Confirmación para Borrar -->
-                <div id="deleteConfirmModal" class="hidden absolute inset-0 z-50 flex items-center justify-center bg-black/95 rounded-3xl backdrop-blur-md p-6">
-                    <div class="bg-gray-900 border border-red-700/60 rounded-xl p-6 text-center max-w-sm w-full shadow-2xl">
-                        <svg class="w-12 h-12 text-red-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                        <h5 class="text-red-500 font-bold mb-2 text-lg">¿Borrar todos los invitados?</h5>
-                        <p class="text-gray-300 text-xs mb-6">Esta acción es irreversible y eliminará completamente la lista de la base de datos.</p>
-                        <div class="flex gap-3">
-                            <button id="btnCancelDelete" class="w-1/2 bg-gray-800 text-gray-300 rounded-lg p-2.5 hover:bg-gray-700 transition text-xs border border-gray-600">Cancelar</button>
-                            <button id="btnConfirmDelete" class="w-1/2 bg-red-600 text-white font-bold rounded-lg p-2.5 hover:bg-red-700 transition text-xs shadow-lg shadow-red-900/50">Sí, Borrar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pie de página con el crédito de autoría -->
-            <div class="mt-8 pt-4 border-t border-yellow-700/20 text-center w-full">
-                <p class="text-yellow-500/80 text-xs tracking-widest uppercase font-medium">Diseño: Profesor Nelson Garro</p>
-            </div>
-
+        <div class="flex flex-col items-start justify-center p-8">
+          <span class="rounded-full border border-yellow-700/50 bg-yellow-900/20 px-3 py-1 text-xs font-semibold text-yellow-300">Invitación interactiva</span>
+          <p class="mt-5 leading-relaxed text-slate-300">Una invitación especial para celebrar a los egresados y compartir este momento con la comunidad educativa.</p>
+          <a href="acto-colacion-cens/" class="mt-7 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-yellow-600 to-yellow-400 px-6 py-3 text-sm font-extrabold text-slate-950 shadow-lg transition hover:scale-[1.03]">
+            Ver invitación <span aria-hidden="true">→</span>
+          </a>
         </div>
-    </div>
+      </article>
+    </section>
 
-    <!-- Script principal -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <section class="mt-12 grid gap-4 sm:grid-cols-3">
+      <div class="rounded-2xl border border-slate-700 bg-slate-900/70 p-5"><p class="font-bold text-yellow-300">Actos institucionales</p><p class="mt-2 text-sm text-slate-400">Celebraciones y momentos importantes de nuestras instituciones.</p></div>
+      <div class="rounded-2xl border border-slate-700 bg-slate-900/70 p-5"><p class="font-bold text-yellow-300">Capacitaciones</p><p class="mt-2 text-sm text-slate-400">Jornadas, talleres y propuestas de formación.</p></div>
+      <div class="rounded-2xl border border-slate-700 bg-slate-900/70 p-5"><p class="font-bold text-yellow-300">Encuentros</p><p class="mt-2 text-sm text-slate-400">Espacios para compartir experiencias y construir comunidad.</p></div>
+    </section>
+  </main>
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'cens-acto-colacion';
-        let inMemoryDatabase = [];
-        let currentLoadedData = [];
-
-        let app, auth, db;
-        try {
-            if (typeof __firebase_config !== 'undefined') {
-                const firebaseConfig = JSON.parse(__firebase_config);
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-            }
-        } catch (e) {
-            console.error("Error al inicializar Firestore:", e);
-        }
-
-        async function authenticateUser() {
-            if (!auth) return { uid: 'usuario-simulado' };
-            try {
-                if (typeof __initial_auth_token !== 'undefined') {
-                    const credentials = await signInWithCustomToken(auth, __initial_auth_token);
-                    return credentials.user;
-                } else {
-                    const credentials = await signInAnonymously(auth);
-                    return credentials.user;
-                }
-            } catch (error) {
-                return { uid: 'usuario-simulado' };
-            }
-        }
-
-        const rsvpForm = document.getElementById('rsvpForm');
-        
-        rsvpForm.addEventListener('submit', async function(e) {
-            e.preventDefault(); 
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Guardando datos...';
-
-            const nombre = document.getElementById('nombre').value;
-            const acompanantes = document.getElementById('acompanantes').value;
-            const asistencia = document.getElementById('asistencia').value;
-
-            const nuevoInvitado = {
-                nombre: nombre,
-                acompanantes: parseInt(acompanantes),
-                asistencia: asistencia,
-                fecha_registro: new Date().toISOString()
-            };
-
-            inMemoryDatabase.push(nuevoInvitado);
-
-            try {
-                const user = await authenticateUser();
-                if (db && user && user.uid !== 'usuario-simulado') {
-                    const rsvpsRef = collection(db, 'artifacts', appId, 'public', 'data', 'invitados');
-                    await addDoc(rsvpsRef, { ...nuevoInvitado, userId: user.uid });
-                }
-            } catch (error) {
-                console.warn("Guardado local.");
-            }
-
-            this.style.opacity = '0';
-            setTimeout(() => {
-                this.style.display = 'none';
-                document.getElementById('formMessage').classList.remove('hidden');
-                document.getElementById('nombre').value = '';
-                document.getElementById('acompanantes').value = '';
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
-            }, 300);
-        });
-
-        // Panel organizador
-        const btnVerInvitados = document.getElementById('btnVerInvitados');
-        const passcodePanel = document.getElementById('passcodePanel');
-        const organizerPasscode = document.getElementById('organizerPasscode');
-        const btnSubmitPasscode = document.getElementById('btnSubmitPasscode');
-        const btnCancelPasscode = document.getElementById('btnCancelPasscode');
-        const passcodeError = document.getElementById('passcodeError');
-        const panelInvitados = document.getElementById('panelInvitados');
-        const btnCerrarPanel = document.getElementById('btnCerrarPanel');
-        const listaContenido = document.getElementById('listaContenido');
-
-        btnVerInvitados.addEventListener('click', () => {
-            rsvpForm.style.display = 'none'; 
-            document.getElementById('formMessage').classList.add('hidden');
-            passcodePanel.classList.remove('hidden');
-            organizerPasscode.value = '';
-            passcodeError.classList.add('hidden');
-        });
-
-        btnCancelPasscode.addEventListener('click', () => {
-            passcodePanel.classList.add('hidden');
-            rsvpForm.style.display = 'block';
-            setTimeout(() => { rsvpForm.style.opacity = '1'; }, 50);
-        });
-
-        btnSubmitPasscode.addEventListener('click', async () => {
-            if (organizerPasscode.value === '17986') {
-                passcodePanel.classList.add('hidden');
-                panelInvitados.classList.remove('hidden');
-                await cargarListaInvitados();
-            } else {
-                passcodeError.classList.remove('hidden');
-                organizerPasscode.value = '';
-                organizerPasscode.focus();
-            }
-        });
-
-        async function cargarListaInvitados() {
-            listaContenido.innerHTML = '<li class="text-center text-gray-500 italic">Cargando...</li>';
-            let listaDatos = [...inMemoryDatabase]; 
-
-            try {
-                const user = await authenticateUser();
-                if (db && user && user.uid !== 'usuario-simulado') {
-                    const rsvpsRef = collection(db, 'artifacts', appId, 'public', 'data', 'invitados');
-                    const querySnapshot = await getDocs(rsvpsRef);
-                    let cloudData = [];
-                    querySnapshot.forEach((doc) => cloudData.push({ id: doc.id, ...doc.data() }));
-                    if (cloudData.length > 0) listaDatos = cloudData;
-                }
-            } catch (error) {
-                console.warn("Carga desde memoria interna.");
-            }
-
-            currentLoadedData = listaDatos;
-            let htmlList = '';
-            let totalAsistentes = 0;
-
-            listaDatos.forEach((data) => {
-                if(data.asistencia === 'si') {
-                    const cant = data.acompanantes || 0;
-                    totalAsistentes += (1 + cant); 
-                    htmlList += `<li class="border-b border-gray-700/50 pb-1.5 flex justify-between items-center">
-                        <span class="font-bold text-yellow-100 truncate pr-2">${data.nombre}</span> 
-                        <span class="text-gray-400 text-[10px] bg-gray-800 px-2 py-0.5 rounded whitespace-nowrap">+ ${cant} acomp.</span>
-                    </li>`;
-                }
-            });
-
-            if (htmlList === '') {
-                htmlList = '<li class="text-gray-400 text-center text-xs">Aún no hay confirmaciones.</li>';
-            } else {
-                htmlList = `<li class="text-yellow-400 font-bold mb-3 bg-yellow-900/30 p-2 rounded text-center border border-yellow-700/50 text-xs">Total asistentes: ${totalAsistentes}</li>` + htmlList;
-            }
-            listaContenido.innerHTML = htmlList;
-        }
-
-        // Descarga PDF
-        document.getElementById('btnDescargarPDF').addEventListener('click', () => {
-            const { jsPDF } = window.jspdf;
-            const docPdf = new jsPDF();
-            docPdf.setFontSize(16);
-            docPdf.text("Acto de Colación - CENS N° 3-468", 14, 20);
-            docPdf.setFontSize(12);
-            docPdf.text("Lista de Asistentes", 14, 28);
-            
-            const tableData = [];
-            let totalGeneral = 0;
-
-            currentLoadedData.forEach(data => {
-                if(data.asistencia === 'si') {
-                    const cant = data.acompanantes || 0;
-                    const totalGrupo = 1 + cant;
-                    totalGeneral += totalGrupo;
-                    tableData.push([data.nombre, cant.toString(), totalGrupo.toString()]);
-                }
-            });
-
-            if(tableData.length > 0) {
-                docPdf.autoTable({
-                    startY: 35,
-                    head: [['Nombre Egresado/a', 'Acompañantes', 'Total']],
-                    body: tableData,
-                    theme: 'grid',
-                    headStyles: { fillColor: [15, 23, 42] }
-                });
-                docPdf.text(`Total general: ${totalGeneral} personas`, 14, docPdf.lastAutoTable.finalY + 15);
-            } else {
-                docPdf.text("Sin registros confirmados.", 14, 45);
-            }
-            docPdf.save("Lista_Invitados_CENS.pdf");
-        });
-
-        // Borrar lista
-        const deleteConfirmModal = document.getElementById('deleteConfirmModal');
-        document.getElementById('btnBorrarLista').addEventListener('click', () => deleteConfirmModal.classList.remove('hidden'));
-        document.getElementById('btnCancelDelete').addEventListener('click', () => deleteConfirmModal.classList.add('hidden'));
-
-        document.getElementById('btnConfirmDelete').addEventListener('click', async () => {
-            inMemoryDatabase = [];
-            try {
-                const user = await authenticateUser();
-                if (db && user && user.uid !== 'usuario-simulado') {
-                    const deletePromises = currentLoadedData
-                        .filter(item => item.id)
-                        .map(item => deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'invitados', item.id)));
-                    await Promise.all(deletePromises);
-                }
-            } catch (e) {}
-            await cargarListaInvitados();
-            deleteConfirmModal.classList.add('hidden');
-        });
-
-        btnCerrarPanel.addEventListener('click', () => {
-            panelInvitados.classList.add('hidden');
-            rsvpForm.style.display = 'block';
-            setTimeout(() => { rsvpForm.style.opacity = '1'; }, 50);
-        });
-
-        // Lógica de Bienvenida y Poesía Flotante Dinámica
-        const welcomeOverlay = document.getElementById('welcomeOverlay');
-        const poemContainer = document.getElementById('poemContainer');
-        const poemText = document.getElementById('poemText');
-
-        const versosPoesia = [
-            "«Cada voz tiene una historia que contar...»",
-            "«Valientes que se animaron a retomar sus sueños...»",
-            "«Persistir ante la dificultad y seguir adelante...»",
-            "«Lo que aprendimos, compartimos y construimos juntos...»",
-            "«Educación que deja huellas imborrables en el alma...»",
-            "«Nuestra propia voz tiene un valor inmenso...»",
-            "«Hoy celebramos todas esas voces... las que dejan huella.»"
-        ];
-
-        let poemaIndex = 0;
-        let poemaInterval;
-
-        welcomeOverlay.addEventListener('click', () => {
-            welcomeOverlay.classList.add('fade-out');
-            poemContainer.classList.remove('hidden');
-
-            // Iniciar ciclo de versos flotantes
-            mostrarSiguienteVerso();
-            poemaInterval = setInterval(mostrarSiguienteVerso, 7000);
-
-            setTimeout(() => {
-                welcomeOverlay.style.display = 'none';
-            }, 1000);
-        });
-
-        function mostrarSiguienteVerso() {
-            poemText.textContent = versosPoesia[poemaIndex];
-            // Reiniciar animación reasignando la clase
-            const currentPoemBox = poemContainer.firstElementChild;
-            currentPoemBox.style.animation = 'none';
-            currentPoemBox.offsetHeight; // Trigger reflow
-            currentPoemBox.style.animation = 'floatPoem 7s ease-in-out infinite';
-
-            poemaIndex = (poemaIndex + 1) % versosPoesia.length;
-        }
-    </script>
+  <footer class="border-t border-slate-800 px-5 py-7 text-center text-xs text-slate-500">
+    IES N.º 9-011 · Profesorado en Informática · Diseño y desarrollo: Prof. Nelson Garro
+  </footer>
 </body>
 </html>
