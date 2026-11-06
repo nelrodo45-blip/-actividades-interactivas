@@ -128,10 +128,10 @@
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
                 <div class="space-y-1">
                     <h2 class="text-xs sm:text-sm md:text-base font-bold text-emerald-400 flex items-center gap-2">
-                        <i class="fa-solid fa-users-gear"></i> Material de Estudio Oficial y Construcción Colaborativa
+                        <i class="fa-solid fa-users-gear"></i> Material de Estudio y Construcción Colaborativa
                     </h2>
                     <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl">
-                        Este glosario contiene conceptos de ejemplo y permite la construcción colaborativa. Explora las tarjetas, evalúa tus conocimientos en Flashcards o aporta nuevos términos con sus definiciones y ejemplos prácticos.
+                        Este glosario contiene conceptos de referencia. Explora las tarjetas, repasa con Flashcards y aporta nuevos términos con sus definiciones y ejemplos prácticos. Los aportes se guardan en este navegador; para compartirlos entre dispositivos se requiere configurar una base de datos Firebase.
                     </p>
                 </div>
                 <div class="flex items-center gap-3 bg-slate-950/80 px-4 py-2.5 rounded-xl border border-slate-800 text-xs sm:text-sm text-slate-300 self-start md:self-auto">
@@ -302,7 +302,42 @@
             }
         ];
 
-        let currentTerms = [...official25Terms];
+        // Persistencia local: funciona en GitHub Pages sin configurar Firebase.
+        const STORAGE_KEY = 'cens-glosario-tic-v1';
+
+        function loadLocalTerms() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                return Array.isArray(saved) ? saved : [];
+            } catch (error) {
+                console.warn('No se pudieron recuperar los términos locales:', error);
+                return [];
+            }
+        }
+
+        function persistLocalTerms() {
+            try {
+                // Se guardan únicamente los aportes del usuario; los conceptos oficiales
+                // permanecen definidos en el archivo y se combinan al iniciar.
+                const customTerms = currentTerms.filter(item =>
+                    item.id && !String(item.id).startsWith('term-')
+                );
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(customTerms));
+            } catch (error) {
+                console.warn('No se pudieron guardar los términos en este navegador:', error);
+                showToast('No se pudo guardar. Comprueba el espacio disponible del navegador.');
+            }
+        }
+
+        function mergeTerms(baseTerms, extraTerms) {
+            const byId = new Map();
+            [...baseTerms, ...extraTerms].forEach(item => {
+                if (item && item.id) byId.set(String(item.id), item);
+            });
+            return Array.from(byId.values());
+        }
+
+        let currentTerms = mergeTerms(official25Terms, loadLocalTerms());
         let currentCategoryFilter = 'ALL';
         let currentFlashcardIndex = 0;
 
@@ -474,9 +509,9 @@
 
                         <h3 class="text-base sm:text-lg font-extrabold text-white tracking-wide">${escapeHTML(item.term)}</h3>
 
-                        ${item.imageUrl ? `
+                        ${safeImageUrl(item.imageUrl) ? `
                             <div class="relative h-36 w-full rounded-xl overflow-hidden border border-slate-800 my-2">
-                                <img src="${escapeHTML(item.imageUrl)}" alt="${escapeHTML(item.term)}" class="w-full h-full object-cover" onerror="this.parentElement.style.display='none'">
+                                <img src="${escapeHTML(safeImageUrl(item.imageUrl))}" alt="${escapeHTML(item.term)}" class="w-full h-full object-cover" onerror="this.parentElement.style.display='none'">
                             </div>
                         ` : ''}
 
@@ -524,10 +559,20 @@
         }
 
         function escapeHTML(str) {
-            if (!str) return '';
-            return str.replace(/[&<>'"]/g, 
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/[&<>'"]/g,
                 tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
             );
+        }
+
+        function safeImageUrl(value) {
+            if (!value) return '';
+            try {
+                const url = new URL(String(value), window.location.href);
+                return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+            } catch (error) {
+                return '';
+            }
         }
 
         window.saveTerm = function(e) {
@@ -537,7 +582,7 @@
             const category = document.getElementById('formCategory').value;
             const definition = document.getElementById('formDefinition').value.trim();
             const example = document.getElementById('formExample').value.trim();
-            const imageUrl = document.getElementById('formImageUrl').value.trim();
+            const imageUrl = safeImageUrl(document.getElementById('formImageUrl').value.trim());
 
             if (!author || !term || !definition) return;
 
@@ -554,8 +599,9 @@
             };
 
             currentTerms.unshift(newTermData);
+            persistLocalTerms();
             renderGlossary();
-            showToast("✓ ¡Nuevo término publicado con éxito!");
+            showToast("✓ ¡Nuevo término publicado y guardado en este navegador!");
 
             if (window.cloudAddTerm) {
                 window.cloudAddTerm(newTermData);
@@ -570,6 +616,7 @@
             if (!target) return;
 
             target.likes = (target.likes || 0) + 1;
+            persistLocalTerms();
             renderGlossary();
 
             if (window.cloudLikeTerm) {
@@ -588,6 +635,14 @@
         // Renderizado inicial al cargar la página
         window.addEventListener('DOMContentLoaded', () => {
             renderGlossary();
+        });
+
+        // Cierre de ventanas emergentes con la tecla Escape.
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                closeAddModal();
+                closeFlashcardsModal();
+            }
         });
     </script>
 
@@ -620,10 +675,11 @@
                     onSnapshot(termsCollectionRef, (snapshot) => {
                         if (!snapshot.empty) {
                             const fetched = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                            const cloudMap = new Map();
-                            official25Terms.forEach(t => cloudMap.set(t.id, t));
-                            fetched.forEach(t => cloudMap.set(t.id, t));
-                            currentTerms = Array.from(cloudMap.values());
+                            currentTerms = mergeTerms(
+                                mergeTerms(official25Terms, loadLocalTerms()),
+                                fetched
+                            );
+                            persistLocalTerms();
                             renderGlossary();
                         }
                     }, (err) => console.log("Modo independiente local activo:", err));
