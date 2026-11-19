@@ -91,7 +91,7 @@
             </div>
 
             <!-- Volver al Portal -->
-            <a href="../../index.html" class="portal-back px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-emerald-600/30" title="Volver al Portal de Actividades">
+            <a href="../../index.html" class="portal-back px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl transition flex items-center gap-2 shadow-lg shadow-emerald-600/30" title="Volver al Portal de Actividades" aria-label="Volver al Portal de Actividades">
                 <i class="fa-solid fa-house"></i><span>Portal</span>
             </a>
 
@@ -116,6 +116,10 @@
                     <i class="fa-solid fa-print text-sky-400 text-sm"></i>
                     <span class="hidden md:inline">Imprimir / PDF</span>
                 </button>
+                <button type="button" onclick="downloadCSV()" class="px-3 py-2 bg-emerald-700 hover:bg-emerald-600 active:scale-95 text-white font-semibold text-xs sm:text-sm rounded-xl transition border border-emerald-600 flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-file-csv text-sm"></i>
+                    <span class="hidden md:inline">Descargar Excel / CSV</span>
+                </button>
             </div>
         </div>
     </header>
@@ -128,10 +132,10 @@
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
                 <div class="space-y-1">
                     <h2 class="text-xs sm:text-sm md:text-base font-bold text-emerald-400 flex items-center gap-2">
-                        <i class="fa-solid fa-users-gear"></i> Material de Estudio y Construcción Colaborativa
+                        <i class="fa-solid fa-users-gear"></i> Material de Estudio Oficial y Construcción Colaborativa
                     </h2>
                     <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl">
-                        Este glosario contiene conceptos de referencia. Explora las tarjetas, repasa con Flashcards y aporta nuevos términos con sus definiciones y ejemplos prácticos. Los aportes se guardan en este navegador; para compartirlos entre dispositivos se requiere configurar una base de datos Firebase.
+                        Este glosario contiene conceptos de ejemplo y permite la construcción colaborativa. Explora las tarjetas, evalúa tus conocimientos en Flashcards o aporta nuevos términos con sus definiciones y ejemplos prácticos.
                     </p>
                 </div>
                 <div class="flex items-center gap-3 bg-slate-950/80 px-4 py-2.5 rounded-xl border border-slate-800 text-xs sm:text-sm text-slate-300 self-start md:self-auto">
@@ -143,6 +147,11 @@
                 </div>
             </div>
         </section>
+
+        <div id="cloudStatus" class="text-xs rounded-xl px-4 py-3 border border-amber-500/30 bg-amber-500/10 text-amber-200">
+            <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+            Preparando conexión al glosario compartido...
+        </div>
 
         <!-- Barra de Búsqueda Dinámica y Filtros por Categoría -->
         <section class="flex flex-col md:flex-row gap-3 items-center justify-between no-print">
@@ -273,6 +282,7 @@
     <footer class="bg-slate-900 border-t border-slate-800 px-6 py-4 text-center text-xs text-slate-400">
         <p>CENS N° 3-468 • Educación Permanente de Jóvenes y Adultos • Cátedra TIC 2026</p>
         <p class="text-slate-300 mt-0.5">Profesor Nelson Garro • Mendoza, Argentina</p>
+        <a href="../../index.html" class="portal-back inline-flex items-center gap-2 mt-3 px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl transition" aria-label="Regresar al Portal"><i class="fa-solid fa-house"></i><span>Regresar al Portal</span></a>
     </footer>
 
     <script>
@@ -302,42 +312,7 @@
             }
         ];
 
-        // Persistencia local: funciona en GitHub Pages sin configurar Firebase.
-        const STORAGE_KEY = 'cens-glosario-tic-v1';
-
-        function loadLocalTerms() {
-            try {
-                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                return Array.isArray(saved) ? saved : [];
-            } catch (error) {
-                console.warn('No se pudieron recuperar los términos locales:', error);
-                return [];
-            }
-        }
-
-        function persistLocalTerms() {
-            try {
-                // Se guardan únicamente los aportes del usuario; los conceptos oficiales
-                // permanecen definidos en el archivo y se combinan al iniciar.
-                const customTerms = currentTerms.filter(item =>
-                    item.id && !String(item.id).startsWith('term-')
-                );
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(customTerms));
-            } catch (error) {
-                console.warn('No se pudieron guardar los términos en este navegador:', error);
-                showToast('No se pudo guardar. Comprueba el espacio disponible del navegador.');
-            }
-        }
-
-        function mergeTerms(baseTerms, extraTerms) {
-            const byId = new Map();
-            [...baseTerms, ...extraTerms].forEach(item => {
-                if (item && item.id) byId.set(String(item.id), item);
-            });
-            return Array.from(byId.values());
-        }
-
-        let currentTerms = mergeTerms(official25Terms, loadLocalTerms());
+        let currentTerms = [...official25Terms];
         let currentCategoryFilter = 'ALL';
         let currentFlashcardIndex = 0;
 
@@ -381,6 +356,31 @@
             document.getElementById('fcAnswerBox').classList.add('hidden');
             document.getElementById('revealBtn').classList.remove('hidden');
         }
+
+        window.downloadCSV = function() {
+            const headers = ['Fecha', 'Autor', 'Término', 'Categoría', 'Definición', 'Ejemplo', 'Imagen'];
+            const rows = currentTerms.map(item => [
+                item.date || '',
+                item.author || '',
+                item.term || '',
+                getCategoryName(item.category),
+                item.definition || '',
+                item.example || '',
+                item.imageUrl || ''
+            ]);
+            const quote = value => '"' + String(value ?? '').replace(/"/g, '""') + '"';
+            const csv = '\uFEFF' + [headers, ...rows].map(row => row.map(quote).join(';')).join('\r\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Glosario_TIC_CENS_3-468.csv';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+            showToast(`✓ Se descargaron ${currentTerms.length} conceptos en CSV.`);
+        };
 
         window.copyAllText = function() {
             let compiledText = `CENS N° 3-468 • Educación Permanente de Jóvenes y Adultos\nMateria: Tecnologías de la Información y la Comunicación (TIC 3° Año)\nProfesor: Nelson Garro • Ciclo Lectivo 2026\n\nGLOSARIO COMPLETO Y INTEGRADOR DE TÉRMINOS TIC (${currentTerms.length} CONCEPTOS):\n\n`;
@@ -509,9 +509,9 @@
 
                         <h3 class="text-base sm:text-lg font-extrabold text-white tracking-wide">${escapeHTML(item.term)}</h3>
 
-                        ${safeImageUrl(item.imageUrl) ? `
+                        ${item.imageUrl ? `
                             <div class="relative h-36 w-full rounded-xl overflow-hidden border border-slate-800 my-2">
-                                <img src="${escapeHTML(safeImageUrl(item.imageUrl))}" alt="${escapeHTML(item.term)}" class="w-full h-full object-cover" onerror="this.parentElement.style.display='none'">
+                                <img src="${escapeHTML(item.imageUrl)}" alt="${escapeHTML(item.term)}" class="w-full h-full object-cover" onerror="this.parentElement.style.display='none'">
                             </div>
                         ` : ''}
 
@@ -559,56 +559,100 @@
         }
 
         function escapeHTML(str) {
-            if (str === null || str === undefined) return '';
-            return String(str).replace(/[&<>'"]/g,
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, 
                 tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
             );
         }
 
-        function safeImageUrl(value) {
-            if (!value) return '';
-            try {
-                const url = new URL(String(value), window.location.href);
-                return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
-            } catch (error) {
-                return '';
-            }
-        }
-
-        window.saveTerm = function(e) {
+        window.saveTerm = async function(e) {
             if (e) e.preventDefault();
+
             const author = document.getElementById('formAuthor').value.trim();
             const term = document.getElementById('formTerm').value.trim();
             const category = document.getElementById('formCategory').value;
             const definition = document.getElementById('formDefinition').value.trim();
             const example = document.getElementById('formExample').value.trim();
-            const imageUrl = safeImageUrl(document.getElementById('formImageUrl').value.trim());
+            const imageUrl = document.getElementById('formImageUrl').value.trim();
 
             if (!author || !term || !definition) return;
-
-            const newTermData = {
-                id: "custom-" + Date.now(),
-                term,
-                category,
-                author,
-                definition,
-                example,
-                imageUrl: imageUrl || '',
-                likes: 1,
-                date: new Date().toISOString().split('T')[0]
-            };
-
-            currentTerms.unshift(newTermData);
-            persistLocalTerms();
-            renderGlossary();
-            showToast("✓ ¡Nuevo término publicado y guardado en este navegador!");
-
-            if (window.cloudAddTerm) {
-                window.cloudAddTerm(newTermData);
+            if (!window.GLOSSARY_API_URL || !window.GLOSSARY_API_URL.startsWith('https://script.google.com/macros/s/')) {
+                showToast('El glosario compartido todavía no está configurado. Falta la URL de Apps Script.');
+                return;
             }
 
-            document.getElementById('termForm').reset();
-            window.closeAddModal();
+            const button = document.querySelector('#termForm button[type="submit"]');
+            if (button) { button.disabled = true; button.textContent = 'Enviando aporte...'; }
+
+            const clientToken = 'ap-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+            const data = {
+                action: 'add',
+                clientToken,
+                author,
+                term,
+                category,
+                definition,
+                example,
+                imageUrl,
+                date: new Date().toISOString().slice(0, 10)
+            };
+
+            try {
+                // Apps Script recibe un POST de formulario en un iframe oculto.
+                // Esto evita los problemas habituales de CORS con las Web Apps de Google.
+                let frame = document.getElementById('appsScriptPostFrame');
+                if (!frame) {
+                    frame = document.createElement('iframe');
+                    frame.id = 'appsScriptPostFrame';
+                    frame.name = 'appsScriptPostFrame';
+                    frame.style.display = 'none';
+                    document.body.appendChild(frame);
+                }
+
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = window.GLOSSARY_API_URL;
+                form.target = 'appsScriptPostFrame';
+                form.style.display = 'none';
+
+                Object.entries(data).forEach(([key, value]) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value == null ? '' : String(value);
+                    form.appendChild(input);
+                });
+
+                document.body.appendChild(form);
+                form.submit();
+                form.remove();
+
+                showToast('Aporte enviado. Se confirmará cuando aparezca en el glosario compartido.');
+                const started = Date.now();
+                const confirmTimer = setInterval(async () => {
+                    await loadSharedTerms();
+                    const found = currentTerms.some(item => item.clientToken === clientToken);
+                    if (found) {
+                        clearInterval(confirmTimer);
+                        document.getElementById('termForm').reset();
+                        window.closeAddModal();
+                        showToast('✓ ¡Tu concepto ya está publicado y visible para todos!');
+                    } else if (Date.now() - started > 30000) {
+                        clearInterval(confirmTimer);
+                        showToast('El envío no pudo confirmarse. Revisá la conexión o consultá al docente.');
+                    }
+                }, 2500);
+            } catch (error) {
+                console.error('Error al enviar el concepto:', error);
+                showToast('No se pudo enviar el aporte. Intentá nuevamente.');
+            } finally {
+                if (button) {
+                    setTimeout(() => {
+                        button.disabled = false;
+                        button.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Publicar Concepto';
+                    }, 1000);
+                }
+            }
         };
 
         window.likeTerm = function(id) {
@@ -616,7 +660,6 @@
             if (!target) return;
 
             target.likes = (target.likes || 0) + 1;
-            persistLocalTerms();
             renderGlossary();
 
             if (window.cloudLikeTerm) {
@@ -636,76 +679,96 @@
         window.addEventListener('DOMContentLoaded', () => {
             renderGlossary();
         });
-
-        // Cierre de ventanas emergentes con la tecla Escape.
-        document.addEventListener('keydown', event => {
-            if (event.key === 'Escape') {
-                closeAddModal();
-                closeFlashcardsModal();
-            }
-        });
     </script>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <script>
+        /*
+         * CONFIGURACIÓN: pegá aquí la URL de implementación de tu Web App de Apps Script.
+         * Se obtiene al implementar el proyecto como Aplicación web.
+         */
+        window.GLOSSARY_API_URL = "https://script.google.com/macros/s/AKfycbyrsP1jcA1__OVeCPTpJCbd_w7wdwcql_CVLS1ofqKH8YOUs3I5RpIkDR3u4oeurnV6/exec";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'cens-glosario-tic';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        let lastSharedSnapshot = '';
+        let pollingInProgress = false;
 
-        if (firebaseConfig) {
+        function setSharedStatus(ok, message) {
+            const el = document.getElementById('cloudStatus');
+            if (!el) return;
+            el.className = ok
+                ? 'text-xs rounded-xl px-4 py-3 border border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
+                : 'text-xs rounded-xl px-4 py-3 border border-amber-500/30 bg-amber-500/10 text-amber-200';
+            el.textContent = message;
+        }
+
+        function jsonp(url) {
+            return new Promise((resolve, reject) => {
+                const callbackName = 'glossaryCallback_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+                const script = document.createElement('script');
+                const timeout = setTimeout(() => {
+                    cleanup();
+                    reject(new Error('Tiempo de espera agotado al consultar Apps Script.'));
+                }, 12000);
+
+                function cleanup() {
+                    clearTimeout(timeout);
+                    delete window[callbackName];
+                    script.remove();
+                }
+
+                window[callbackName] = data => {
+                    cleanup();
+                    resolve(data);
+                };
+                script.onerror = () => {
+                    cleanup();
+                    reject(new Error('No se pudo conectar con la hoja compartida.'));
+                };
+                script.src = url + (url.includes('?') ? '&' : '?') +
+                    'action=list&callback=' + encodeURIComponent(callbackName) +
+                    '&_=' + Date.now();
+                document.head.appendChild(script);
+            });
+        }
+
+        async function loadSharedTerms() {
+            if (pollingInProgress) return;
+            if (!window.GLOSSARY_API_URL || window.GLOSSARY_API_URL.startsWith('PEGAR_')) {
+                setSharedStatus(false, 'Pendiente de configuración: falta pegar la URL de la aplicación web de Google Apps Script.');
+                return;
+            }
+
+            pollingInProgress = true;
             try {
-                const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
-                const db = getFirestore(app);
+                const result = await jsonp(window.GLOSSARY_API_URL);
+                if (!result || result.ok !== true || !Array.isArray(result.terms)) {
+                    throw new Error(result && result.error ? result.error : 'Respuesta no válida del servidor.');
+                }
 
-                (async () => {
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-
-                    // Strict path rule: /artifacts/{appId}/public/data/glossary_terms
-                    const termsCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'glossary_terms');
-
-                    // Real-time listener
-                    onSnapshot(termsCollectionRef, (snapshot) => {
-                        if (!snapshot.empty) {
-                            const fetched = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                            currentTerms = mergeTerms(
-                                mergeTerms(official25Terms, loadLocalTerms()),
-                                fetched
-                            );
-                            persistLocalTerms();
-                            renderGlossary();
-                        }
-                    }, (err) => console.log("Modo independiente local activo:", err));
-
-                    window.cloudAddTerm = async function(termData) {
-                        try {
-                            await addDoc(termsCollectionRef, termData);
-                        } catch (err) {
-                            console.log("Guardado local:", err);
-                        }
-                    };
-
-                    window.cloudLikeTerm = async function(id) {
-                        if (id.startsWith('term-') || id.startsWith('custom-')) return;
-                        try {
-                            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'glossary_terms', id);
-                            await updateDoc(docRef, { likes: increment(1) });
-                        } catch (err) {
-                            console.log("Like local:", err);
-                        }
-                    };
-                })();
-            } catch (err) {
-                console.log("Operando localmente:", err);
+                const snapshot = JSON.stringify(result.terms);
+                if (snapshot !== lastSharedSnapshot) {
+                    lastSharedSnapshot = snapshot;
+                    const merged = new Map();
+                    official25Terms.forEach(item => merged.set(item.id, item));
+                    result.terms.forEach(item => merged.set(item.id, item));
+                    currentTerms = Array.from(merged.values()).sort((a, b) =>
+                        String(b.timestamp || b.date || '').localeCompare(String(a.timestamp || a.date || ''))
+                    );
+                    renderGlossary();
+                }
+                setSharedStatus(true, `Conectado a Google Sheets • ${result.terms.length} aportes compartidos • actualización automática cada 5 segundos.`);
+            } catch (error) {
+                console.error('Error consultando Google Sheets:', error);
+                setSharedStatus(false, 'No se pudo actualizar el glosario. Revisá la URL de Apps Script y los permisos de publicación.');
+            } finally {
+                pollingInProgress = false;
             }
         }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderGlossary();
+            loadSharedTerms();
+            setInterval(loadSharedTerms, 5000);
+        });
     </script>
 </body>
 </html>
