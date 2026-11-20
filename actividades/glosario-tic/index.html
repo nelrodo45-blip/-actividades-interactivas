@@ -312,7 +312,16 @@
             }
         ];
 
-        let currentTerms = [...official25Terms];
+        // Orden alfabético español: ignora números y signos al comienzo del término.
+        function compareTermsAlphabetically(a, b) {
+            const clean = value => String(value || '').trim().replace(/^\s*\d+\s*[.)\-:]\s*/, '');
+            return clean(a.term).localeCompare(clean(b.term), 'es', {
+                sensitivity: 'base',
+                numeric: true
+            });
+        }
+
+        let currentTerms = [...official25Terms].sort(compareTermsAlphabetically);
         let currentCategoryFilter = 'ALL';
         let currentFlashcardIndex = 0;
 
@@ -479,12 +488,12 @@
 
             let filtered = currentTerms.filter(t => {
                 const matchesCat = currentCategoryFilter === 'ALL' || t.category === currentCategoryFilter;
-                const matchesSearch = t.term.toLowerCase().includes(searchVal) ||
-                                      t.definition.toLowerCase().includes(searchVal) ||
+                const matchesSearch = String(t.term || '').toLowerCase().includes(searchVal) ||
+                                      String(t.definition || '').toLowerCase().includes(searchVal) ||
                                       (t.example && t.example.toLowerCase().includes(searchVal)) ||
                                       (t.author && t.author.toLowerCase().includes(searchVal));
                 return matchesCat && matchesSearch;
-            });
+            }).sort(compareTermsAlphabetically);
 
             if (counter) counter.innerText = currentTerms.length;
 
@@ -750,9 +759,7 @@
                     const merged = new Map();
                     official25Terms.forEach(item => merged.set(item.id, item));
                     result.terms.forEach(item => merged.set(item.id, item));
-                    currentTerms = Array.from(merged.values()).sort((a, b) =>
-                        String(b.timestamp || b.date || '').localeCompare(String(a.timestamp || a.date || ''))
-                    );
+                    currentTerms = Array.from(merged.values()).sort(compareTermsAlphabetically);
                     renderGlossary();
                 }
                 setSharedStatus(true, `Conectado a Google Sheets • ${result.terms.length} aportes compartidos • actualización automática cada 5 segundos.`);
